@@ -9,6 +9,12 @@ public class RoomGenerator : MonoBehaviour
 
     void Start()
     {
+        RegenerateRoom();
+    }
+
+    public void RegenerateRoom()
+    {
+        ClearChildren();
         GenerateRoom();
     }
 
@@ -29,6 +35,14 @@ public class RoomGenerator : MonoBehaviour
         {
             Instantiate(wallPrefab, new Vector3(-1, y, 1f), Quaternion.identity, transform);
             Instantiate(wallPrefab, new Vector3(width, y, 1f), Quaternion.identity, transform);
+        }
+    }
+
+    void ClearChildren()
+    {
+        for (int i = transform.childCount - 1; i >= 0; i--)
+        {
+            Destroy(transform.GetChild(i).gameObject);
         }
     }
 }
