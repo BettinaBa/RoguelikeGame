@@ -5,6 +5,7 @@ on:
     types:
       - labeled
 
+# Repo must be set to “Read and write” under Settings → Actions → General → Workflow permissions.
 permissions:
   pull-requests: write
   contents: read
@@ -13,13 +14,11 @@ jobs:
   automerge:
     runs-on: ubuntu-latest
     steps:
-      - name: Fetch pull request number
-        id: fetch_pr
-        run: echo "PR_NUMBER=${{ github.event.pull_request.number }}" >> $GITHUB_ENV
       - name: Enable auto-merge
-        if: env.PR_NUMBER != ''
+        # Note: we do NOT use github.token here!
         uses: peter-evans/enable-pull-request-automerge@v2
         with:
-          pull-request-number: ${{ env.PR_NUMBER }}
+          # <- THIS must point at your PAT secret, not the built-in token.
+          token: ${{ secrets.AUTO_MERGE_TOKEN }}
+          pull-request-number: ${{ github.event.pull_request.number }}
           merge-method: squash
-
