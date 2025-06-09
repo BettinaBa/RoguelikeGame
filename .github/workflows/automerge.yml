@@ -13,6 +13,12 @@ jobs:
   automerge:
     runs-on: ubuntu-latest
     steps:
-      - uses: peter-evans/enable-pull-request-automerge@v2
+      - name: Fetch pull request number
+        id: fetch_pr
+        run: echo "PR_NUMBER=${{ github.event.pull_request.number }}" >> $GITHUB_ENV
+      - name: Enable auto-merge
+        if: env.PR_NUMBER != ''
+        uses: peter-evans/enable-pull-request-automerge@v2
         with:
           merge-method: squash
+
