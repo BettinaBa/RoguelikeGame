@@ -33,7 +33,10 @@ public class PlayerAttack : MonoBehaviour
         {
             var enemyHealth = hit.GetComponent<EnemyHealth>();
             if (enemyHealth != null)
+            {
                 enemyHealth.TakeDamage(1);
+                Debug.Log($"Damaged {hit.name}");
+            }
         }
     }
 
