@@ -364,7 +364,7 @@ MonoBehaviour:
   attackRadius: 1
   enemyLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 64
   cooldownTime: 0.5
   scaleMultiplier: 1.2
 --- !u!95 &126443110
@@ -639,7 +639,7 @@ GameObject:
   - component: {fileID: 1096257155}
   - component: {fileID: 1096257154}
   - component: {fileID: 1096257159}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Enemy
   m_TagString: Enemy
   m_Icon: {fileID: 0}

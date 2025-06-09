@@ -9,6 +9,12 @@ public class PlayerAttack : MonoBehaviour
     private Vector3 originalScale;
     public float scaleMultiplier = 1.2f;
 
+    void Awake()
+    {
+        if (enemyLayers == 0)
+            enemyLayers = LayerMask.GetMask("Enemy");
+    }
+
     void Start()
     {
         originalScale = transform.localScale;
@@ -29,6 +35,7 @@ public class PlayerAttack : MonoBehaviour
 
         // Damage logic
         Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, attackRadius, enemyLayers);
+        Debug.Log($"Attack detected {hits.Length} hit(s)");
         foreach (var hit in hits)
         {
             var enemyHealth = hit.GetComponent<EnemyHealth>();
