@@ -20,5 +20,6 @@ jobs:
         if: env.PR_NUMBER != ''
         uses: peter-evans/enable-pull-request-automerge@v2
         with:
+          pull-request-number: ${{ env.PR_NUMBER }}
           merge-method: squash
 
