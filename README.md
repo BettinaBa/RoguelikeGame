@@ -7,3 +7,4 @@ This project contains a tiny prototype used for demonstration. To test player at
 3. Select the **Enemy** object in the Hierarchy and verify its **Layer** is set to `Enemy`.
 4. Select the **Player** object and check the **PlayerAttack** component. The **Enemy Layers** field should include the `Enemy` layer. The script now assigns this automatically if left empty.
 5. Press Play and hit Space to swing at the enemy. The Console will log how many hits were detected and the enemy's remaining health.
+6. The enemy now wanders randomly until the player enters its detection range, then it will chase and try to collide with the player. You can tweak the **Detection Range** and **Wander Change Interval** fields on the Enemy object to adjust this behaviour.
