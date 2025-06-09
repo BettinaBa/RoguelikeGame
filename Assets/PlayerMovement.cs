@@ -15,6 +15,7 @@ public class PlayerMovement : MonoBehaviour
     {
         moveDirection.x = Input.GetAxisRaw("Horizontal");
         moveDirection.y = Input.GetAxisRaw("Vertical");
+        moveDirection = moveDirection.normalized;
     }
 
     void FixedUpdate()
