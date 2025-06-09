@@ -29,6 +29,7 @@ public class PlayerAttack : MonoBehaviour
 
         // Damage logic
         Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, attackRadius, enemyLayers);
+        Debug.Log($"Attack detected {hits.Length} hit(s)");
         foreach (var hit in hits)
         {
             var enemyHealth = hit.GetComponent<EnemyHealth>();
