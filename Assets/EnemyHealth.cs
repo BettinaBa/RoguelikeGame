@@ -26,7 +26,7 @@ public class EnemyHealth : MonoBehaviour
             Destroy(gameObject);
             if (DifficultyManager.Instance != null)
                 DifficultyManager.Instance.RegisterKill();
-            RoomGenerator rg = FindObjectOfType<RoomGenerator>();
+            RoomGenerator rg = FindAnyObjectByType<RoomGenerator>();
             if (rg != null)
                 rg.RegenerateRoom();
         }
