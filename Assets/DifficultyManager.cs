@@ -45,6 +45,9 @@ public class DifficultyManager : MonoBehaviour
         EnemyHealth eh = enemy.GetComponent<EnemyHealth>();
         if (eh != null)
             eh.maxHealth = Mathf.RoundToInt(eh.maxHealth * GetDifficultyMultiplier());
+        EnemyAI ai = enemy.GetComponent<EnemyAI>();
+        if (ai != null)
+            ai.damage = Mathf.RoundToInt(ai.damage * GetDifficultyMultiplier());
     }
 
     public void RegisterKill()

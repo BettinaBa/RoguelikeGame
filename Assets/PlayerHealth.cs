@@ -4,6 +4,7 @@ public class PlayerHealth : MonoBehaviour
 {
     public int maxHealth = 5;
     private int currentHealth;
+    public FloatingDamageText damageTextPrefab;
 
     void Start()
     {
@@ -14,6 +15,11 @@ public class PlayerHealth : MonoBehaviour
     {
         currentHealth -= amount;
         Debug.Log("Player Health: " + currentHealth);
+        if (damageTextPrefab != null)
+        {
+            var text = Instantiate(damageTextPrefab, transform.position, Quaternion.identity);
+            text.Setup(amount);
+        }
 
         if (currentHealth <= 0)
         {
