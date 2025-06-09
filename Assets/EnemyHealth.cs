@@ -4,6 +4,7 @@ public class EnemyHealth : MonoBehaviour
 {
     public int maxHealth = 3;
     private int currentHealth;
+    public FloatingDamageText damageTextPrefab;
 
     void Start()
     {
@@ -14,6 +15,11 @@ public class EnemyHealth : MonoBehaviour
     {
         currentHealth -= amount;
         Debug.Log("Enemy Health: " + currentHealth);
+        if (damageTextPrefab != null)
+        {
+            var text = Instantiate(damageTextPrefab, transform.position, Quaternion.identity);
+            text.Setup(amount);
+        }
 
         if (currentHealth <= 0)
         {

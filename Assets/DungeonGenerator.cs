@@ -6,11 +6,18 @@ public class DungeonGenerator : MonoBehaviour
     public GameObject floorPrefab;
     public GameObject wallPrefab;
     public int steps = 50;
+    public bool randomSeed = true;
+    public int seed = 0;
 
     private HashSet<Vector2Int> floorPositions = new HashSet<Vector2Int>();
 
     void Start()
     {
+        if (randomSeed)
+            Random.InitState(System.DateTime.Now.GetHashCode());
+        else
+            Random.InitState(seed);
+        ClearChildren();
         GenerateDungeon();
     }
 
@@ -45,6 +52,15 @@ public class DungeonGenerator : MonoBehaviour
         {
             Instantiate(wallPrefab, new Vector3(pos.x, pos.y, 1f), Quaternion.identity, transform);
         }
+    }
+
+    void ClearChildren()
+    {
+        for (int i = transform.childCount - 1; i >= 0; i--)
+        {
+            Destroy(transform.GetChild(i).gameObject);
+        }
+        floorPositions.Clear();
     }
 
     Vector2Int GetRandomDirection()
