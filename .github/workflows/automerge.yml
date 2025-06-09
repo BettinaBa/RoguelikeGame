@@ -1,4 +1,3 @@
-# .github/workflows/automerge.yml
 name: Auto Merge
 
 on:
@@ -6,6 +5,7 @@ on:
     types:
       - labeled
 
+# Repo must be set to “Read and write” under Settings → Actions → General → Workflow permissions.
 permissions:
   pull-requests: write
   contents: read
@@ -15,8 +15,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Enable auto-merge
+        # Note: we do NOT use github.token here!
         uses: peter-evans/enable-pull-request-automerge@v2
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          # <- THIS must point at your PAT secret, not the built-in token.
+          token: ${{ secrets.AUTO_MERGE_TOKEN }}
           pull-request-number: ${{ github.event.pull_request.number }}
-          merge-method: squash   # or "merge" / "rebase"
+          merge-method: squash
