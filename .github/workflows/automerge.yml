@@ -1,3 +1,4 @@
+# .github/workflows/automerge.yml
 name: Auto Merge
 
 on:
@@ -13,13 +14,9 @@ jobs:
   automerge:
     runs-on: ubuntu-latest
     steps:
-      - name: Fetch pull request number
-        id: fetch_pr
-        run: echo "PR_NUMBER=${{ github.event.pull_request.number }}" >> $GITHUB_ENV
-
       - name: Enable auto-merge
-        if: env.PR_NUMBER != ''
         uses: peter-evans/enable-pull-request-automerge@v2
         with:
-          pull-request-number: ${{ env.PR_NUMBER }}
-          merge-method: squash   # choose from squash, merge, or rebase
+          token: ${{ secrets.GITHUB_TOKEN }}
+          pull-request-number: ${{ github.event.pull_request.number }}
+          merge-method: squash   # or "merge" / "rebase"
