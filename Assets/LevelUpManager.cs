@@ -57,6 +57,7 @@ public class LevelUpManager : MonoBehaviour
             return;
 
         optionPanel.SetActive(true);
+        Time.timeScale = 0f;
 
         foreach (Transform child in optionPanel.transform)
             Destroy(child.gameObject);
@@ -83,6 +84,7 @@ public class LevelUpManager : MonoBehaviour
             if (text != null) text.text = up.label;
             btn.onClick.AddListener(() => {
                 up.apply();
+                Time.timeScale = 1f;
                 optionPanel.SetActive(false);
             });
         }
