@@ -6,6 +6,7 @@ public class EnemyHealth : MonoBehaviour
     private int currentHealth;
     public int experienceReward = 1;
     public FloatingDamageText damageTextPrefab;
+    public Pickup xpPickupPrefab;
 
     void Start()
     {
@@ -24,13 +25,13 @@ public class EnemyHealth : MonoBehaviour
 
         if (currentHealth <= 0)
         {
-            PlayerExperience pe = FindAnyObjectByType<PlayerExperience>();
-            if (pe != null)
-                pe.AddExperience(experienceReward);
+            if (xpPickupPrefab != null)
+                Instantiate(xpPickupPrefab, transform.position, Quaternion.identity);
 
             Destroy(gameObject);
             if (DifficultyManager.Instance != null)
                 DifficultyManager.Instance.RegisterKill();
+
             RoomGenerator rg = FindAnyObjectByType<RoomGenerator>();
             if (rg != null)
                 rg.RegenerateRoom();
