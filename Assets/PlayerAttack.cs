@@ -17,7 +17,8 @@ public class PlayerAttack : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space) && Time.time >= lastAttackTime + cooldownTime)
+        // Attack when the E key is pressed
+        if (Input.GetKeyDown(KeyCode.E) && Time.time >= lastAttackTime + cooldownTime)
             Swing();
     }
 
