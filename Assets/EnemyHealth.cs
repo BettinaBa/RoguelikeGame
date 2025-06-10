@@ -4,6 +4,7 @@ public class EnemyHealth : MonoBehaviour
 {
     public int maxHealth = 3;
     private int currentHealth;
+    public int experienceReward = 1;
     public FloatingDamageText damageTextPrefab;
     public Pickup xpPickupPrefab;
 
@@ -30,6 +31,7 @@ public class EnemyHealth : MonoBehaviour
             Destroy(gameObject);
             if (DifficultyManager.Instance != null)
                 DifficultyManager.Instance.RegisterKill();
+
             RoomGenerator rg = FindAnyObjectByType<RoomGenerator>();
             if (rg != null)
                 rg.RegenerateRoom();
