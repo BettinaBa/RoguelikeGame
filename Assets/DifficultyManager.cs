@@ -27,6 +27,8 @@ public class DifficultyManager : MonoBehaviour
 
     void Update()
     {
+        if (GameOverManager.Instance != null && GameOverManager.Instance.IsGameOver)
+            return;
         if (Time.time >= nextSpawnTime)
         {
             SpawnEnemy();

@@ -17,6 +17,9 @@ public class PlayerAttack : MonoBehaviour
 
     void Update()
     {
+        if (GameOverManager.Instance != null && GameOverManager.Instance.IsGameOver)
+            return;
+
         // Attack when the E key is pressed
         if (Input.GetKeyDown(KeyCode.E) && Time.time >= lastAttackTime + cooldownTime)
             Swing();

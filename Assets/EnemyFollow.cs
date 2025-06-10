@@ -16,6 +16,9 @@ public class EnemyFollow : MonoBehaviour
 
     void Update()
     {
+        if (GameOverManager.Instance != null && GameOverManager.Instance.IsGameOver)
+            return;
+
         if (player != null)
         {
             Vector2 direction = (player.position - transform.position).normalized;
@@ -25,6 +28,9 @@ public class EnemyFollow : MonoBehaviour
 
     void FixedUpdate()
     {
+        if (GameOverManager.Instance != null && GameOverManager.Instance.IsGameOver)
+            return;
+
         rb.MovePosition(rb.position + movement * speed * Time.fixedDeltaTime);
     }
 
