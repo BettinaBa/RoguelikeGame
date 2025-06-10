@@ -11,18 +11,14 @@ public class DungeonGenerator : MonoBehaviour
 
     private HashSet<Vector2Int> floorPositions = new HashSet<Vector2Int>();
 
-    void Start()
+    public static (HashSet<Vector2Int> floors, HashSet<Vector2Int> walls) GenerateDungeonData(int steps, bool randomSeed, int seed)
     {
         if (randomSeed)
             Random.InitState(System.DateTime.Now.GetHashCode());
         else
             Random.InitState(seed);
-        ClearChildren();
-        GenerateDungeon();
-    }
 
-    void GenerateDungeon()
-    {
+        HashSet<Vector2Int> floorPositions = new();
         Vector2Int currentPosition = Vector2Int.zero;
         floorPositions.Add(currentPosition);
 
@@ -32,12 +28,7 @@ public class DungeonGenerator : MonoBehaviour
             floorPositions.Add(currentPosition);
         }
 
-        foreach (var pos in floorPositions)
-        {
-            Instantiate(floorPrefab, new Vector3(pos.x, pos.y, 1f), Quaternion.identity, transform);
-        }
-
-        HashSet<Vector2Int> wallPositions = new HashSet<Vector2Int>();
+        HashSet<Vector2Int> wallPositions = new();
         foreach (var pos in floorPositions)
         {
             foreach (Vector2Int dir in Directions())
@@ -48,10 +39,25 @@ public class DungeonGenerator : MonoBehaviour
             }
         }
 
-        foreach (var pos in wallPositions)
-        {
+        return (floorPositions, wallPositions);
+    }
+
+    void Start()
+    {
+        ClearChildren();
+        GenerateDungeon();
+    }
+
+    void GenerateDungeon()
+    {
+        var data = GenerateDungeonData(steps, randomSeed, seed);
+        floorPositions = data.floors;
+
+        foreach (var pos in data.floors)
+            Instantiate(floorPrefab, new Vector3(pos.x, pos.y, 1f), Quaternion.identity, transform);
+
+        foreach (var pos in data.walls)
             Instantiate(wallPrefab, new Vector3(pos.x, pos.y, 1f), Quaternion.identity, transform);
-        }
     }
 
     void ClearChildren()
@@ -63,7 +69,7 @@ public class DungeonGenerator : MonoBehaviour
         floorPositions.Clear();
     }
 
-    Vector2Int GetRandomDirection()
+    static Vector2Int GetRandomDirection()
     {
         int index = Random.Range(0, 4);
         switch (index)
@@ -75,7 +81,7 @@ public class DungeonGenerator : MonoBehaviour
         }
     }
 
-    IEnumerable<Vector2Int> Directions()
+    static IEnumerable<Vector2Int> Directions()
     {
         yield return Vector2Int.up;
         yield return Vector2Int.down;
