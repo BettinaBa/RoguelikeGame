@@ -39,33 +39,40 @@ public class DifficultyManager : MonoBehaviour
         if (enemyPrefab == null)
             return;
 
-        Camera cam = Camera.main;
-        if (cam == null)
-            return;
+        Bounds bounds = MapChunkManager.Instance != null ? MapChunkManager.Instance.GetLoadedBounds() : new Bounds();
+        bool useChunk = bounds.size != Vector3.zero;
+        if (!useChunk)
+        {
+            Camera cam = Camera.main;
+            if (cam == null)
+                return;
 
-        float height = cam.orthographicSize * 2f;
-        float width = height * cam.aspect;
-        Vector3 camPos = cam.transform.position;
-        float minX = camPos.x - width / 2f;
-        float maxX = camPos.x + width / 2f;
-        float minY = camPos.y - height / 2f;
-        float maxY = camPos.y + height / 2f;
+            float height = cam.orthographicSize * 2f;
+            float width = height * cam.aspect;
+            Vector3 camPos = cam.transform.position;
+            bounds = new Bounds(camPos, new Vector3(width, height, 0f));
+        }
+
+        float minX = bounds.min.x;
+        float maxX = bounds.max.x;
+        float minY = bounds.min.y;
+        float maxY = bounds.max.y;
         float offset = 1f;
 
         Vector3 spawnPos = Vector3.zero;
         switch (Random.Range(0, 4))
         {
             case 0:
-                spawnPos = new Vector3(minX - offset, Random.Range(minY, maxY), 0f);
+                spawnPos = new Vector3(minX + offset, Random.Range(minY, maxY), 0f);
                 break;
             case 1:
-                spawnPos = new Vector3(maxX + offset, Random.Range(minY, maxY), 0f);
+                spawnPos = new Vector3(maxX - offset, Random.Range(minY, maxY), 0f);
                 break;
             case 2:
-                spawnPos = new Vector3(Random.Range(minX, maxX), maxY + offset, 0f);
+                spawnPos = new Vector3(Random.Range(minX, maxX), maxY - offset, 0f);
                 break;
             default:
-                spawnPos = new Vector3(Random.Range(minX, maxX), minY - offset, 0f);
+                spawnPos = new Vector3(Random.Range(minX, maxX), minY + offset, 0f);
                 break;
         }
 
