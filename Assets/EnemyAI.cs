@@ -28,6 +28,8 @@ public class EnemyAI : MonoBehaviour
 
     void Update()
     {
+        if (GameOverManager.Instance != null && GameOverManager.Instance.IsGameOver)
+            return;
         if (player == null)
             return;
 
@@ -58,6 +60,8 @@ public class EnemyAI : MonoBehaviour
 
     void FixedUpdate()
     {
+        if (GameOverManager.Instance != null && GameOverManager.Instance.IsGameOver)
+            return;
         if (player == null)
             return;
 

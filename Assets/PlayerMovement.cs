@@ -13,6 +13,9 @@ public class PlayerMovement : MonoBehaviour
 
     void Update()
     {
+        if (GameOverManager.Instance != null && GameOverManager.Instance.IsGameOver)
+            return;
+
         moveDirection.x = Input.GetAxisRaw("Horizontal");
         moveDirection.y = Input.GetAxisRaw("Vertical");
         moveDirection = moveDirection.normalized;
@@ -20,6 +23,9 @@ public class PlayerMovement : MonoBehaviour
 
     void FixedUpdate()
     {
+        if (GameOverManager.Instance != null && GameOverManager.Instance.IsGameOver)
+            return;
+
         rb.MovePosition(rb.position + moveDirection * moveSpeed * Time.fixedDeltaTime);
     }
 }
