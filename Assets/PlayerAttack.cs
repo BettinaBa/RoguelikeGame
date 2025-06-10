@@ -8,6 +8,7 @@ public class PlayerAttack : MonoBehaviour
     private float lastAttackTime = -999f;
     private Vector3 originalScale;
     public float scaleMultiplier = 1.2f;
+    public int damage = 1;
 
     void Start()
     {
@@ -34,7 +35,7 @@ public class PlayerAttack : MonoBehaviour
             var enemyHealth = hit.GetComponent<EnemyHealth>();
             if (enemyHealth != null)
             {
-                enemyHealth.TakeDamage(1);
+                enemyHealth.TakeDamage(damage);
                 Debug.Log($"Damaged {hit.name}");
             }
         }
