@@ -5,6 +5,7 @@ public class EnemyHealth : MonoBehaviour
     public int maxHealth = 3;
     private int currentHealth;
     public FloatingDamageText damageTextPrefab;
+    public Pickup xpPickupPrefab;
 
     void Start()
     {
@@ -23,6 +24,9 @@ public class EnemyHealth : MonoBehaviour
 
         if (currentHealth <= 0)
         {
+            if (xpPickupPrefab != null)
+                Instantiate(xpPickupPrefab, transform.position, Quaternion.identity);
+
             Destroy(gameObject);
             if (DifficultyManager.Instance != null)
                 DifficultyManager.Instance.RegisterKill();
