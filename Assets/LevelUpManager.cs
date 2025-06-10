@@ -68,7 +68,7 @@ public class LevelUpManager : MonoBehaviour
             ("Increase Move Speed", () => { if (playerMovement != null) playerMovement.moveSpeed += 1f; })
         };
 
-        var chosen = new List<(string,System.Action)>();
+        var chosen = new List<(string label, System.Action apply)>();
         while (chosen.Count < 3 && upgrades.Count > 0)
         {
             int index = Random.Range(0, upgrades.Count);
