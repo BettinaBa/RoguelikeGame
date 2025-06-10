@@ -4,6 +4,7 @@ public class EnemyHealth : MonoBehaviour
 {
     public int maxHealth = 3;
     private int currentHealth;
+    public int experienceReward = 1;
     public FloatingDamageText damageTextPrefab;
 
     void Start()
@@ -23,6 +24,10 @@ public class EnemyHealth : MonoBehaviour
 
         if (currentHealth <= 0)
         {
+            PlayerExperience pe = FindAnyObjectByType<PlayerExperience>();
+            if (pe != null)
+                pe.AddExperience(experienceReward);
+
             Destroy(gameObject);
             if (DifficultyManager.Instance != null)
                 DifficultyManager.Instance.RegisterKill();
