@@ -169,7 +169,7 @@ MonoBehaviour:
   maxHealth: 3
   experienceReward: 1
   damageTextPrefab: {fileID: 0}
-  xpPickupPrefab: {fileID: 0}
+  xpPickupPrefab: {fileID: 8365154387049940543, guid: 2a2e33d7d9298d5458fce91be3aa10ce, type: 3}
 --- !u!114 &-7827119864390000583
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -182,9 +182,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e74b5e6ecae44530aa30b03928efb4d5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  chaseRange: 5
+  chaseRange: 10
   attackRange: 1
   moveSpeed: 2
   attackCooldown: 1
   damage: 1
   patrolChangeInterval: 2
+  playerLayer:
+    serializedVersion: 2
+    m_Bits: 65

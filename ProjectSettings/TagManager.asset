@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Wall
   - Enemy
+  - XP_Pickup
   layers:
   - Default
   - TransparentFX
@@ -13,7 +14,7 @@ TagManager:
   - Enemy
   - Water
   - UI
-  - 
+  - Player
   - 
   - 
   - 
