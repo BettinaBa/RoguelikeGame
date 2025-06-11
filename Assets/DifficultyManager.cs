@@ -29,6 +29,7 @@ public class DifficultyManager : MonoBehaviour
     {
         if (GameOverManager.Instance != null && GameOverManager.Instance.IsGameOver)
             return;
+
         if (Time.time >= nextSpawnTime)
         {
             SpawnEnemy();
@@ -41,59 +42,53 @@ public class DifficultyManager : MonoBehaviour
         if (enemyPrefab == null)
             return;
 
-        Bounds bounds = MapChunkManager.Instance != null ? MapChunkManager.Instance.GetLoadedBounds() : new Bounds();
-        bool useChunk = bounds.size != Vector3.zero;
-        if (!useChunk)
-        {
-            Camera cam = Camera.main;
-            if (cam == null)
-                return;
+        // Determine spawn bounds
+        Bounds bounds = MapChunkManager.Instance != null
+            ? MapChunkManager.Instance.GetLoadedBounds()
+            : GetCameraBounds();
 
-            float height = cam.orthographicSize * 2f;
-            float width = height * cam.aspect;
-            Vector3 camPos = cam.transform.position;
-            bounds = new Bounds(camPos, new Vector3(width, height, 0f));
-        }
-
-        float minX = bounds.min.x;
-        float maxX = bounds.max.x;
-        float minY = bounds.min.y;
-        float maxY = bounds.max.y;
+        // Choose a random edge position
         float offset = 1f;
-
-        Vector3 spawnPos = Vector3.zero;
+        Vector3 spawnPos;
         switch (Random.Range(0, 4))
         {
             case 0:
-                spawnPos = new Vector3(minX + offset, Random.Range(minY, maxY), 0f);
+                spawnPos = new Vector3(bounds.min.x + offset, Random.Range(bounds.min.y, bounds.max.y), 0f);
                 break;
             case 1:
-                spawnPos = new Vector3(maxX - offset, Random.Range(minY, maxY), 0f);
+                spawnPos = new Vector3(bounds.max.x - offset, Random.Range(bounds.min.y, bounds.max.y), 0f);
                 break;
             case 2:
-                spawnPos = new Vector3(Random.Range(minX, maxX), maxY - offset, 0f);
+                spawnPos = new Vector3(Random.Range(bounds.min.x, bounds.max.x), bounds.max.y - offset, 0f);
                 break;
             default:
-                spawnPos = new Vector3(Random.Range(minX, maxX), minY + offset, 0f);
+                spawnPos = new Vector3(Random.Range(bounds.min.x, bounds.max.x), bounds.min.y + offset, 0f);
                 break;
         }
 
+        // Instantiate enemy
         GameObject enemy = Instantiate(enemyPrefab, spawnPos, Quaternion.identity);
+
+        // Scale health by difficulty
         EnemyHealth eh = enemy.GetComponent<EnemyHealth>();
         if (eh != null)
             eh.maxHealth = Mathf.RoundToInt(eh.maxHealth * GetDifficultyMultiplier());
+
+        // Scale AI damage by difficulty
         EnemyAI ai = enemy.GetComponent<EnemyAI>();
         if (ai != null)
             ai.damage = Mathf.RoundToInt(ai.damage * GetDifficultyMultiplier());
+    }
 
-        Transform player = GameObject.FindGameObjectWithTag("Player")?.transform;
-        if (player != null)
-        {
-            enemy.transform.up = (player.position - enemy.transform.position).normalized;
-            EnemyFollow follow = enemy.GetComponent<EnemyFollow>();
-            if (follow != null)
-                follow.player = player;
-        }
+    private Bounds GetCameraBounds()
+    {
+        Camera cam = Camera.main;
+        if (cam == null)
+            return new Bounds();
+
+        float height = cam.orthographicSize * 2f;
+        float width = height * cam.aspect;
+        return new Bounds(cam.transform.position, new Vector3(width, height, 0f));
     }
 
     public void RegisterKill()

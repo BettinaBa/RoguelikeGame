@@ -7,7 +7,7 @@ public class MapChunkManager : MonoBehaviour
 
     public Transform player;
     public GameObject floorPrefab;
-    public GameObject wallPrefab;
+    // Removed wallPrefab since walls are no longer used
     public int chunkSize = 10;
     public int loadRadius = 2;
 
@@ -37,10 +37,13 @@ public class MapChunkManager : MonoBehaviour
     {
         if (player == null)
             return;
+
         Vector2 playerPos = player.position;
         Vector2Int playerChunk = new Vector2Int(
             Mathf.FloorToInt(playerPos.x / chunkSize),
-            Mathf.FloorToInt(playerPos.y / chunkSize));
+            Mathf.FloorToInt(playerPos.y / chunkSize)
+        );
+
         HashSet<Vector2Int> needed = new();
         for (int dx = -loadRadius; dx <= loadRadius; dx++)
             for (int dy = -loadRadius; dy <= loadRadius; dy++)
@@ -52,6 +55,7 @@ public class MapChunkManager : MonoBehaviour
                 CreateChunk(coord);
         }
 
+        // Remove distant chunks
         List<Vector2Int> remove = new();
         foreach (var kv in chunks)
         {
@@ -72,19 +76,26 @@ public class MapChunkManager : MonoBehaviour
         chunkParent.transform.position = new Vector3(coord.x * chunkSize, coord.y * chunkSize, 0f);
         chunks[coord] = chunkParent;
 
-        var data = RoomGenerator.GenerateRoomData(chunkSize, chunkSize);
-        foreach (var pos in data.floors)
-            Instantiate(floorPrefab, chunkParent.transform.position + new Vector3(pos.x, pos.y, 1f), Quaternion.identity, chunkParent.transform);
-        foreach (var pos in data.walls)
-            Instantiate(wallPrefab, chunkParent.transform.position + new Vector3(pos.x, pos.y, 1f), Quaternion.identity, chunkParent.transform);
+        // Generate floor positions for this chunk
+        HashSet<Vector2Int> floors = RoomGenerator.GenerateRoomData(chunkSize, chunkSize);
+        foreach (var pos in floors)
+        {
+            Instantiate(
+                floorPrefab,
+                chunkParent.transform.position + new Vector3(pos.x, pos.y, 1f),
+                Quaternion.identity,
+                chunkParent.transform
+            );
+        }
     }
 
     public Bounds GetLoadedBounds()
     {
         if (chunks.Count == 0)
             return new Bounds();
-        Vector2 min = new(float.MaxValue, float.MaxValue);
-        Vector2 max = new(float.MinValue, float.MinValue);
+
+        Vector2 min = new Vector2(float.MaxValue, float.MaxValue);
+        Vector2 max = new Vector2(float.MinValue, float.MinValue);
         foreach (Vector2Int coord in chunks.Keys)
         {
             Vector2 origin = new Vector2(coord.x * chunkSize, coord.y * chunkSize);

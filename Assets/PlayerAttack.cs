@@ -1,4 +1,5 @@
-using UnityEngine;
+﻿using UnityEngine;
+using UnityEngine.InputSystem;  // ← new
 
 public class PlayerAttack : MonoBehaviour
 {
@@ -15,24 +16,20 @@ public class PlayerAttack : MonoBehaviour
         originalScale = transform.localScale;
     }
 
-    void Update()
+    // ← new callback, replaces Update polling
+    public void OnAttack(InputValue value)
     {
-        if (GameOverManager.Instance != null && GameOverManager.Instance.IsGameOver)
-            return;
-
-        // Attack when the E key is pressed
-        if (Input.GetKeyDown(KeyCode.E) && Time.time >= lastAttackTime + cooldownTime)
-            Swing();
+        if (!value.isPressed) return;
+        if (Time.time < lastAttackTime + cooldownTime) return;
+        Swing();
     }
 
     void Swing()
     {
         lastAttackTime = Time.time;
-        // Quick pulse effect on placeholder circle
         transform.localScale = originalScale * scaleMultiplier;
         Invoke(nameof(ResetScale), cooldownTime / 2);
 
-        // Damage logic
         Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, attackRadius, enemyLayers);
         foreach (var hit in hits)
         {
