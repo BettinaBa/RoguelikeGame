@@ -1,55 +1,81 @@
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class GameOverManager : MonoBehaviour
 {
     public static GameOverManager Instance { get; private set; }
 
-    public GameObject gameOverUI;
-    public bool IsGameOver { get; private set; }
+    [Header("UI")]
+    public GameObject gameOverPanel;  // Drag “GameOverPanel” here
+    public Text pupText;        // Drag “PUPText” here
+    public Button restartButton;  // Drag “RestartButton” here
+    public Button menuButton;     // Drag “MenuButton” here
+
+    [Header("PUP Settings")]
+    public float secondsPerPUP = 30f;
+    public int killsPerPUP = 10;
+
+    public bool IsGameOver { get; private set; } = false;
+    private float startTime;
 
     void Awake()
     {
+        // Singleton—but do NOT persist across scenes
         if (Instance == null)
+        {
             Instance = this;
+        }
         else
+        {
             Destroy(gameObject);
+            return;
+        }
     }
 
     void Start()
     {
-        if (gameOverUI == null)
-            CreateDefaultUI();
-        if (gameOverUI != null)
-            gameOverUI.SetActive(false);
-    }
+        // Hide panel at start
+        gameOverPanel.SetActive(false);
 
-    void CreateDefaultUI()
-    {
-        var canvasGO = new GameObject("GameOverCanvas");
-        var canvas = canvasGO.AddComponent<Canvas>();
-        canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-        canvasGO.AddComponent<CanvasScaler>();
-        canvasGO.AddComponent<GraphicRaycaster>();
-
-        gameOverUI = new GameObject("GameOverText");
-        gameOverUI.transform.SetParent(canvasGO.transform);
-        var text = gameOverUI.AddComponent<Text>();
-        text.alignment = TextAnchor.MiddleCenter;
-        text.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
-        text.text = "Game Over";
-        RectTransform rt = gameOverUI.GetComponent<RectTransform>();
-        rt.anchorMin = new Vector2(0.5f, 0.5f);
-        rt.anchorMax = new Vector2(0.5f, 0.5f);
-        rt.sizeDelta = new Vector2(200, 100);
+        startTime = Time.time;
+        restartButton.onClick.AddListener(RestartGame);
+        menuButton.onClick.AddListener(ReturnToMenu);
     }
 
     public void GameOver()
     {
-        if (IsGameOver)
-            return;
         IsGameOver = true;
-        if (gameOverUI != null)
-            gameOverUI.SetActive(true);
+        Time.timeScale = 0f;
+
+        // compute PUPs
+        int timePUP = Mathf.FloorToInt((Time.time - startTime) / secondsPerPUP);
+        int killPUP = DifficultyManager.Instance != null
+                     ? DifficultyManager.Instance.EnemiesDefeated / killsPerPUP
+                     : 0;
+        int earned = timePUP + killPUP;
+
+        // save
+        int total = PlayerPrefs.GetInt("PUP", 0) + earned;
+        PlayerPrefs.SetInt("PUP", total);
+        PlayerPrefs.Save();
+
+        // update UI & show
+        pupText.text = $"You earned {earned} PUP(s)\nTotal: {total}";
+        gameOverPanel.SetActive(true);
+    }
+
+    void RestartGame()
+    {
+        IsGameOver = false;
+        Time.timeScale = 1f;
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
+
+    void ReturnToMenu()
+    {
+        IsGameOver = false;
+        Time.timeScale = 1f;
+        SceneManager.LoadScene("MainMenu");
     }
 }

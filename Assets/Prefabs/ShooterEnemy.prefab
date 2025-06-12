@@ -13,9 +13,9 @@ GameObject:
   - component: {fileID: 124980383684009217}
   - component: {fileID: 7606681515181000948}
   - component: {fileID: 2026848764904998958}
-  - component: {fileID: -7827119864390000583}
+  - component: {fileID: -5090483732443940068}
   m_Layer: 3
-  m_Name: Enemy
+  m_Name: ShooterEnemy
   m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -172,7 +172,7 @@ MonoBehaviour:
   healthPickupPrefab: {fileID: 8365154387049940543, guid: 9ca8565c5e857f74d920b1cd31d620c3, type: 3}
   healthDropChance: 0.2
   damageTextPrefab: {fileID: 0}
---- !u!114 &-7827119864390000583
+--- !u!114 &-5090483732443940068
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -181,15 +181,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 3127573181285724724}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e74b5e6ecae44530aa30b03928efb4d5, type: 3}
+  m_Script: {fileID: 11500000, guid: d66399c9a3072c84b92d014d26084738, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  chaseRange: 10
-  attackRange: 1
-  moveSpeed: 2
-  attackCooldown: 1
-  damage: 1
-  patrolChangeInterval: 2
-  playerLayer:
-    serializedVersion: 2
-    m_Bits: 65
+  player: {fileID: 0}
+  bulletPrefab: {fileID: 4415707380694734099, guid: dfbc990df10b6a04f8eab20b930d9965, type: 3}
+  fireRate: 1
+  shootRange: 8

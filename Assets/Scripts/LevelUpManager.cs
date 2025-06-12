@@ -6,101 +6,91 @@ public class LevelUpManager : MonoBehaviour
 {
     public static LevelUpManager Instance { get; private set; }
 
-    public GameObject levelUpPanel;
-    public Transform buttonContainer;
-    public GameObject levelUpButtonPrefab;
-    public List<string> upgrades;
+    [Header("UI References")]
+    public GameObject levelUpPanel;       // Drag in your LevelUpPanel
+    public Transform buttonContainer;    // Drag in your ButtonContainer (Transform)
+    public GameObject optionButtonPrefab; // Drag in your OptionButton prefab
 
-    private List<GameObject> currentButtons = new List<GameObject>();
+    // Local multipliers (reset each run)
+    private float damageMultiplier = 1f;
+    private float xpGainMultiplierLocal = 1f;
+    private float speedMultiplierLocal = 1f;
 
     void Awake()
     {
-        if (Instance == null)
-        {
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
-        }
-        else
-        {
-            Destroy(gameObject);
-            return;
-        }
-
-        CreateDefaultUI();
+        if (Instance == null) Instance = this;
+        else { Destroy(gameObject); return; }
     }
 
-    void CreateDefaultUI()
-    {
-        // Ensure we use a valid built-in font
-        Font defaultFont = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-
-        // Create a simple panel if none assigned
-        if (levelUpPanel == null)
-        {
-            levelUpPanel = new GameObject("LevelUpPanel", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
-            var panelImage = levelUpPanel.GetComponent<Image>();
-            panelImage.color = new Color(0f, 0f, 0f, 0.5f);
-            var rt = (RectTransform)levelUpPanel.transform;
-            rt.SetParent(this.transform);
-            rt.anchorMin = new Vector2(0.25f, 0.25f);
-            rt.anchorMax = new Vector2(0.75f, 0.75f);
-            rt.offsetMin = Vector2.zero;
-            rt.offsetMax = Vector2.zero;
-        }
-
-        // Create a vertical layout group container for buttons
-        if (buttonContainer == null)
-        {
-            GameObject container = new GameObject("ButtonContainer", typeof(RectTransform), typeof(VerticalLayoutGroup));
-            buttonContainer = container.transform;
-            var rt = (RectTransform)container.transform;
-            rt.SetParent(levelUpPanel.transform);
-            rt.anchorMin = new Vector2(0.1f, 0.1f);
-            rt.anchorMax = new Vector2(0.9f, 0.9f);
-            rt.offsetMin = Vector2.zero;
-            rt.offsetMax = Vector2.zero;
-        }
-
-        // Create sample buttons
-        foreach (var upgrade in upgrades)
-        {
-            GameObject btnObj = Instantiate(levelUpButtonPrefab, buttonContainer);
-            Text btnText = btnObj.GetComponentInChildren<Text>();
-            if (btnText != null)
-            {
-                btnText.font = defaultFont;
-                btnText.text = upgrade;
-            }
-            currentButtons.Add(btnObj);
-        }
-    }
-
+    /// <summary>
+    /// Call to pause the game and show three choice buttons.
+    /// </summary>
     public void ShowLevelUpOptions(List<string> options)
     {
-        // Clear old buttons
-        foreach (var btn in currentButtons)
-            Destroy(btn);
-        currentButtons.Clear();
-
-        // Create new buttons for options
-        Font defaultFont = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-        foreach (var opt in options)
-        {
-            GameObject btnObj = Instantiate(levelUpButtonPrefab, buttonContainer);
-            Text btnText = btnObj.GetComponentInChildren<Text>();
-            if (btnText != null)
-            {
-                btnText.font = defaultFont;
-                btnText.text = opt;
-            }
-            currentButtons.Add(btnObj);
-        }
-
+        // Pause everything
+        Time.timeScale = 0f;
         levelUpPanel.SetActive(true);
+
+        // Clear old buttons
+        foreach (Transform t in buttonContainer)
+            Destroy(t.gameObject);
+
+        // Create new buttons
+        foreach (string opt in options)
+        {
+            var buttonGO = Instantiate(optionButtonPrefab, buttonContainer);
+            buttonGO.GetComponentInChildren<Text>().text = opt;
+            buttonGO.GetComponent<Button>()
+                .onClick.AddListener(() =>
+                {
+                    ApplyUpgrade(opt);
+                    HideLevelUpOptions();
+                });
+        }
     }
 
-    public void HideLevelUpPanel()
+    /// <summary>
+    /// Hide panel and resume the game.
+    /// </summary>
+    private void HideLevelUpOptions()
     {
         levelUpPanel.SetActive(false);
+        Time.timeScale = 1f;
+    }
+
+    /// <summary>
+    /// Parse the choice string and apply the corresponding buff.
+    /// </summary>
+    private void ApplyUpgrade(string choice)
+    {
+        var player = GameObject.FindGameObjectWithTag("Player");
+        if (player == null) return;
+
+        if (choice.Contains("Damage"))
+        {
+            damageMultiplier *= 1.1f;
+            var atk = player.GetComponent<PlayerAttack>();
+            if (atk != null)
+                atk.damage = Mathf.RoundToInt(atk.damage * 1.1f);
+        }
+        else if (choice.Contains("XP Gain"))
+        {
+            xpGainMultiplierLocal *= 1.15f;
+            var xp = player.GetComponent<PlayerExperience>();
+            if (xp != null)
+                xp.xpGainMultiplier = xpGainMultiplierLocal;
+        }
+        else if (choice.Contains("Move Speed"))
+        {
+            speedMultiplierLocal *= 1.1f;
+            var mv = player.GetComponent<PlayerMovement>();
+            if (mv != null)
+                mv.moveSpeed *= 1.1f;
+        }
+
+        Debug.Log($"Applied upgrade [{choice}]. " +
+                  $"DMG×{damageMultiplier:F2}, " +
+                  $"XP×{xpGainMultiplierLocal:F2}, " +
+                  $"SPD×{speedMultiplierLocal:F2}");
     }
 }

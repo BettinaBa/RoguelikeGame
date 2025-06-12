@@ -4,9 +4,12 @@ using UnityEngine;
 public class PlayerExperience : MonoBehaviour
 {
     [Tooltip("Current XP accumulated")]
-    public int currentXP = 0;
+    [SerializeField] private int currentXP = 0;
     [Tooltip("XP required to reach next level")]
-    public int xpToLevel = 10;
+    [SerializeField] private int xpToLevel = 10;
+
+    [Tooltip("Multiplier applied to all XP gained")]
+    public float xpGainMultiplier = 1f;
 
     /// <summary>
     /// Exposes current XP for UI.
@@ -24,37 +27,40 @@ public class PlayerExperience : MonoBehaviour
     }
 
     /// <summary>
-    /// Adds experience points.
+    /// Adds experience points (after applying xpGainMultiplier).
     /// </summary>
     public void AddXP(int amount)
     {
-        currentXP += amount;
-        if (currentXP >= xpToLevel)
+        int gained = Mathf.RoundToInt(amount * xpGainMultiplier);
+        currentXP += gained;
+
+        if (currentXP >= xpToLevel && LevelUpManager.Instance != null)
         {
             currentXP -= xpToLevel;
-            List<string> options = GenerateLevelUpOptions();
+            var options = GenerateLevelUpOptions();
             LevelUpManager.Instance.ShowLevelUpOptions(options);
         }
+
         UpdateUI();
     }
 
     /// <summary>
-    /// Alias for AddXP, for compatibility with PickupCollector.
+    /// Alias for AddXP, used by PickupCollector.
     /// </summary>
-    public void AddExperience(int amount)
-    {
-        AddXP(amount);
-    }
+    public void AddExperience(int amount) => AddXP(amount);
 
-    void UpdateUI()
-    {
-        // You can fire events here or leave empty if UIUpdater polls in Update().
-    }
+    /// <summary>
+    /// Hook for updating any XP UI. If you poll CurrentXP/XPToNextLevel, leave empty.
+    /// </summary>
+    private void UpdateUI() { }
 
-    List<string> GenerateLevelUpOptions()
+    /// <summary>
+    /// Builds three dummy upgrade descriptions.
+    /// </summary>
+    private List<string> GenerateLevelUpOptions()
     {
-        // Replace these with your real upgrade logic!
-        return new List<string> {
+        return new List<string>
+        {
             "+10% Damage",
             "+15% XP Gain",
             "+10% Move Speed"

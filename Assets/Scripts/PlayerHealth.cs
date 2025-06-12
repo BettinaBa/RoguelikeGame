@@ -22,6 +22,7 @@ public class PlayerHealth : MonoBehaviour
 
     public void TakeDamage(int amount)
     {
+        Debug.Log($"TakeDamage called: HP before = {currentHealth}, damage = {amount}");
         currentHealth -= amount;
         Debug.Log("Player Health: " + currentHealth);
         if (damageTextPrefab != null)
@@ -33,7 +34,7 @@ public class PlayerHealth : MonoBehaviour
 
         if (currentHealth <= 0)
         {
-            Debug.Log("Player Died!");
+            Debug.Log("Player Died! Calling OnDeath()");
             OnDeath();
         }
     }
