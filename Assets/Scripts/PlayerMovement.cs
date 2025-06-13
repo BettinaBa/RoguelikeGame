@@ -28,20 +28,23 @@ public class PlayerMovement : MonoBehaviour
 
     void Update()
     {
-        // WASD / arrows
-        moveInput.x = Input.GetAxisRaw("Horizontal");
-        moveInput.y = Input.GetAxisRaw("Vertical");
+        // WASD via explicit key checks in case axes aren't configured
+        moveInput = Vector2.zero;
+        if (Input.GetKey(KeyCode.A)) moveInput.x -= 1f;
+        if (Input.GetKey(KeyCode.D)) moveInput.x += 1f;
+        if (Input.GetKey(KeyCode.S)) moveInput.y -= 1f;
+        if (Input.GetKey(KeyCode.W)) moveInput.y += 1f;
         moveInput.Normalize();
 
         // Space → dash
         if (stats != null
             && stats.dashUnlocked
             && Input.GetKeyDown(KeyCode.Space)
-            && Time.time >= lastDashTime + dashCooldown
-            && moveInput.sqrMagnitude > 0f)
+            && Time.time >= lastDashTime + dashCooldown)
         {
             lastDashTime = Time.time;
-            rb.MovePosition(rb.position + moveInput * dashDistance);
+            if (moveInput.sqrMagnitude > 0f)
+                rb.MovePosition(rb.position + moveInput * dashDistance);
         }
     }
 
