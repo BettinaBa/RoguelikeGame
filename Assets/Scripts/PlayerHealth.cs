@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class PlayerHealth : MonoBehaviour
 {
-    [Tooltip("Maximum health of the player.")]
+    [Tooltip("Base health of the player; will be overridden by any permanent upgrades.")]
     public int maxHealth = 5;
     private int currentHealth;
 
@@ -16,6 +16,10 @@ public class PlayerHealth : MonoBehaviour
 
     void Start()
     {
+        // Apply any permanent +MaxHP upgrades from PlayerPrefs:
+        //   Meta_MaxHP key holds the actual max health (defaults to whatever you set in the inspector).
+        maxHealth = PlayerPrefs.GetInt("Meta_MaxHP", maxHealth);
+
         currentHealth = maxHealth;
         UpdateUI();
     }
@@ -54,6 +58,6 @@ public class PlayerHealth : MonoBehaviour
 
     void UpdateUI()
     {
-        // You can fire events here or leave empty if UIUpdater polls in Update().
+        // Leave empty if your UIUpdater is polling CurrentHealth each frame
     }
 }

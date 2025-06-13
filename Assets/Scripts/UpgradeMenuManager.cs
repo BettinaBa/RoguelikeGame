@@ -1,23 +1,31 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
 public class UpgradeMenuManager : MonoBehaviour
 {
     [Header("UI")]
-    public Text pupDisplay;
+    public Text pupDisplay;     // your PUP counter
     public Button buyHPButton;
     public Button buySpeedButton;
+    public Button resetButton;     // ← new
     public Button backButton;
 
+    // costs
     const int hpCost = 1;
     const int speedCost = 1;
+
+    // “factory defaults” for your meta-upgrades
+    const int defaultMetaMaxHP = 5;
+    const float defaultMetaSpeedMult = 1f;
 
     void Start()
     {
         RefreshPUP();
+
         buyHPButton.onClick.AddListener(BuyMaxHP);
         buySpeedButton.onClick.AddListener(BuySpeed);
+        resetButton.onClick.AddListener(ResetUpgrades);   // ← hook up
         backButton.onClick.AddListener(BackToMain);
     }
 
@@ -34,8 +42,11 @@ public class UpgradeMenuManager : MonoBehaviour
         {
             pup -= hpCost;
             PlayerPrefs.SetInt("PUP", pup);
-            PlayerPrefs.SetInt("Meta_MaxHP",
-                PlayerPrefs.GetInt("Meta_MaxHP", 5) + 1);
+
+            // bump stored max-HP
+            int prev = PlayerPrefs.GetInt("Meta_MaxHP", defaultMetaMaxHP);
+            PlayerPrefs.SetInt("Meta_MaxHP", prev + 1);
+
             PlayerPrefs.Save();
             RefreshPUP();
         }
@@ -48,11 +59,24 @@ public class UpgradeMenuManager : MonoBehaviour
         {
             pup -= speedCost;
             PlayerPrefs.SetInt("PUP", pup);
-            PlayerPrefs.SetFloat("Meta_SpeedMult",
-                PlayerPrefs.GetFloat("Meta_SpeedMult", 1f) * 1.1f);
+
+            // multiply stored speed
+            float prev = PlayerPrefs.GetFloat("Meta_SpeedMult", defaultMetaSpeedMult);
+            PlayerPrefs.SetFloat("Meta_SpeedMult", prev * 1.1f);
+
             PlayerPrefs.Save();
             RefreshPUP();
         }
+    }
+
+    void ResetUpgrades()
+    {
+        // 🧹 wipe everything back to your “fresh install” defaults
+        PlayerPrefs.SetInt("Meta_MaxHP", defaultMetaMaxHP);
+        PlayerPrefs.SetFloat("Meta_SpeedMult", defaultMetaSpeedMult);
+        PlayerPrefs.Save();
+
+        RefreshPUP();
     }
 
     void BackToMain()
