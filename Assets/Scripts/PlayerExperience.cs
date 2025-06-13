@@ -21,17 +21,6 @@ public class PlayerExperience : MonoBehaviour
     /// </summary>
     public int XPToNextLevel => xpToLevel;
 
-    // track upgrades already chosen so we don't offer them again
-    private readonly HashSet<string> chosenUpgrades = new HashSet<string>();
-
-    /// <summary>
-    /// Record an upgrade choice so it won't be offered again.
-    /// </summary>
-    public void RegisterUpgrade(string name)
-    {
-        chosenUpgrades.Add(name);
-    }
-
     // the full list of possible upgrades
     private static readonly List<string> allUpgrades = new List<string>
     {
@@ -92,13 +81,10 @@ public class PlayerExperience : MonoBehaviour
         float dpm = m.damageTaken / elapsedMin;  // damage per minute
         float kpm = m.kills / elapsedMin;  // kills per minute
 
-        // 2) Build weighted list excluding already chosen upgrades
+        // 2) Build weighted list
         var weighted = new List<(string name, float w)>();
         foreach (var name in allUpgrades)
         {
-            if (chosenUpgrades.Contains(name))
-                continue;
-
             float weight = 1f;
 
             // bias toward more HP if taking lots of damage
@@ -121,7 +107,7 @@ public class PlayerExperience : MonoBehaviour
 
         // 3) Sample three distinct upgrades
         var chosen = new List<string>();
-        for (int pick = 0; pick < 3 && weighted.Count > 0; pick++)
+        for (int pick = 0; pick < 3; pick++)
         {
             // compute total weight
             float total = 0f;
