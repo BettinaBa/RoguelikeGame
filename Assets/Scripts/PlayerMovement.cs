@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.InputSystem;
 
 [RequireComponent(typeof(Rigidbody2D))]
 public class PlayerMovement : MonoBehaviour
@@ -28,18 +29,27 @@ public class PlayerMovement : MonoBehaviour
 
     void Update()
     {
-        // WASD via explicit key checks in case axes aren't configured
+        // Gather movement input from the new Input System
         moveInput = Vector2.zero;
-        if (Input.GetKey(KeyCode.A)) moveInput.x -= 1f;
-        if (Input.GetKey(KeyCode.D)) moveInput.x += 1f;
-        if (Input.GetKey(KeyCode.S)) moveInput.y -= 1f;
-        if (Input.GetKey(KeyCode.W)) moveInput.y += 1f;
-        moveInput.Normalize();
+        var keyboard = Keyboard.current;
+        if (keyboard != null)
+        {
+            if (keyboard.aKey.isPressed || keyboard.leftArrowKey.isPressed) moveInput.x -= 1f;
+            if (keyboard.dKey.isPressed || keyboard.rightArrowKey.isPressed) moveInput.x += 1f;
+            if (keyboard.sKey.isPressed || keyboard.downArrowKey.isPressed) moveInput.y -= 1f;
+            if (keyboard.wKey.isPressed || keyboard.upArrowKey.isPressed) moveInput.y += 1f;
+        }
+
+        var gamepad = Gamepad.current;
+        if (gamepad != null)
+            moveInput += gamepad.leftStick.ReadValue();
+
+        moveInput = Vector2.ClampMagnitude(moveInput, 1f);
 
         // Space → dash
         if (stats != null
             && stats.dashUnlocked
-            && Input.GetKeyDown(KeyCode.Space)
+            && (keyboard != null && keyboard.spaceKey.wasPressedThisFrame)
             && Time.time >= lastDashTime + dashCooldown)
         {
             lastDashTime = Time.time;

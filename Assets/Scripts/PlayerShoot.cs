@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 [RequireComponent(typeof(Rigidbody2D))]
 public class PlayerShoot : MonoBehaviour
@@ -26,7 +27,8 @@ public class PlayerShoot : MonoBehaviour
         if (GameOverManager.Instance != null && GameOverManager.Instance.IsGameOver)
             return;
 
-        if (Input.GetMouseButton(1))
+        var mouse = Mouse.current;
+        if (mouse != null && mouse.rightButton.isPressed)
         {
             float effectiveRate = baseFireRate * (stats?.fireRateMultiplier ?? 1f);
             if (Time.time >= nextFireTime)
@@ -39,7 +41,7 @@ public class PlayerShoot : MonoBehaviour
 
     void ShootTowardsMouse()
     {
-        Vector3 mouseWorld = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        Vector3 mouseWorld = Camera.main.ScreenToWorldPoint(Mouse.current.position.ReadValue());
         mouseWorld.z = 0f;
         Vector2 dir = ((Vector2)mouseWorld - (Vector2)transform.position).normalized;
 
