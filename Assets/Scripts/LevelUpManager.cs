@@ -117,6 +117,8 @@ public class LevelUpManager : MonoBehaviour
                 break;
         }
 
+        xp?.RegisterUpgrade(choice);
+
         Debug.Log($"Applied upgrade: {choice}");
     }
 }
