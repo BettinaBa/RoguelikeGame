@@ -5,19 +5,21 @@ public class DifficultyManager : MonoBehaviour
     public static DifficultyManager Instance { get; private set; }
 
     [Header("Spawn Settings")]
-    public GameObject meleePrefab;     // your melee Enemy prefab
-    public GameObject shooterPrefab;   // your ranged ShooterEnemy prefab
+    public GameObject meleePrefab;
+    public GameObject shooterPrefab;
+    [Tooltip("Prefab for the mini-boss.")]
+    public GameObject bossPrefab;
+    [Tooltip("Seconds until boss appears.")]
+    public float bossSpawnTime = 180f;
+    [Tooltip("Minimum distance (units) from player when boss spawns.")]
+    public float minBossDistance = 8f;
+    [Tooltip("Seconds between regular enemy spawns.")]
     public float spawnInterval = 5f;
-    [Tooltip("How many enemies to spawn each wave")]
-    public int spawnCount = 3;
 
-    private float nextSpawnTime = 0f;
+    private float nextSpawnTime;
+    private bool bossSpawned = false;
     private int enemiesDefeated;
-    /// <summary>
-    /// How many enemies have been killed so far.
-    /// </summary>
     public int EnemiesDefeated => enemiesDefeated;
-
     private float startTime;
 
     void Awake()
@@ -29,108 +31,119 @@ public class DifficultyManager : MonoBehaviour
     void Start()
     {
         startTime = Time.time;
-        nextSpawnTime = Time.time + spawnInterval;
+        nextSpawnTime = startTime + spawnInterval;
     }
 
     void Update()
     {
-        // Pause spawning if the game is over
         if (GameOverManager.Instance != null && GameOverManager.Instance.IsGameOver)
             return;
 
+        float elapsed = Time.time - startTime;
+
+        // 1) Boss spawn after bossSpawnTime, at least minBossDistance away
+        if (!bossSpawned && elapsed >= bossSpawnTime)
+        {
+            SpawnBoss();
+            bossSpawned = true;
+        }
+
+        // 2) Regular enemies
         if (Time.time >= nextSpawnTime)
         {
-            // spawn a small squad
-            for (int i = 0; i < spawnCount; i++)
-                SpawnEnemy();
-
-            // schedule the next wave
+            SpawnEnemy();
             nextSpawnTime = Time.time + spawnInterval / GetDifficultyMultiplier();
         }
     }
 
-    void SpawnEnemy()
+    private void SpawnEnemy()
     {
-        // choose melee or shooter at random
-        GameObject prefabToSpawn = (Random.value < 0.5f)
-            ? meleePrefab
-            : shooterPrefab;
+        GameObject prefab = (Random.value < 0.5f) ? meleePrefab : shooterPrefab;
+        if (prefab == null) return;
 
-        if (prefabToSpawn == null)
-            return;
+        Vector3 pos = GetEdgeSpawnPosition();
+        var enemy = Instantiate(prefab, pos, Quaternion.identity);
 
-        // determine spawn area
-        Bounds bounds = (MapChunkManager.Instance != null)
-            ? MapChunkManager.Instance.GetLoadedBounds()
-            : GetCameraBounds();
-
-        float offset = 1f;
-        Vector3 spawnPos;
-        switch (Random.Range(0, 4))
+        // **Only scale health**, and at half the usual rate
+        if (enemy.TryGetComponent<EnemyHealth>(out var eh))
         {
-            case 0:
-                spawnPos = new Vector3(bounds.min.x + offset,
-                                       Random.Range(bounds.min.y, bounds.max.y),
-                                       0f);
-                break;
-            case 1:
-                spawnPos = new Vector3(bounds.max.x - offset,
-                                       Random.Range(bounds.min.y, bounds.max.y),
-                                       0f);
-                break;
-            case 2:
-                spawnPos = new Vector3(Random.Range(bounds.min.x, bounds.max.x),
-                                       bounds.max.y - offset,
-                                       0f);
-                break;
-            default:
-                spawnPos = new Vector3(Random.Range(bounds.min.x, bounds.max.x),
-                                       bounds.min.y + offset,
-                                       0f);
-                break;
+            float ramp = GetDifficultyMultiplier();
+            float slowRamp = 1f + (ramp - 1f) * 0.5f;
+            eh.maxHealth = Mathf.RoundToInt(eh.maxHealth * slowRamp);
         }
 
-        // instantiate & scale stats
-        GameObject enemy = Instantiate(prefabToSpawn, spawnPos, Quaternion.identity);
+        // leave damage untouched
+    }
 
-        // scale health if it has EnemyHealth
-        var eh = enemy.GetComponent<EnemyHealth>();
-        if (eh != null)
-            eh.maxHealth = Mathf.RoundToInt(eh.maxHealth * GetDifficultyMultiplier());
+    private void SpawnBoss()
+    {
+        if (bossPrefab == null) return;
+        var player = GameObject.FindGameObjectWithTag("Player");
+        if (player == null)
+        {
+            // fallback to camera-center if no Player found
+            var cam = Camera.main;
+            Instantiate(bossPrefab,
+                cam != null ? (Vector3)cam.transform.position : Vector3.zero,
+                Quaternion.identity);
+            return;
+        }
 
-        // scale damage if it has EnemyAI
-        var ai = enemy.GetComponent<EnemyAI>();
-        if (ai != null)
-            ai.damage = Mathf.RoundToInt(ai.damage * GetDifficultyMultiplier());
+        // pick random point in view until it's far enough from player
+        Bounds area = GetCameraBounds();
+        Vector3 spawn;
+        int tries = 0;
+        do
+        {
+            spawn = new Vector3(
+                Random.Range(area.min.x, area.max.x),
+                Random.Range(area.min.y, area.max.y),
+                0f
+            );
+            tries++;
+        }
+        while (Vector2.Distance(spawn, player.transform.position) < minBossDistance
+               && tries < 20);
+
+        Instantiate(bossPrefab, spawn, Quaternion.identity);
+        Debug.Log("Mini-boss spawned at " + spawn);
+    }
+
+    private Vector3 GetEdgeSpawnPosition()
+    {
+        Bounds b = (MapChunkManager.Instance != null)
+            ? MapChunkManager.Instance.GetLoadedBounds()
+            : GetCameraBounds();
+        float offset = 1f;
+        switch (Random.Range(0, 4))
+        {
+            case 0: return new Vector3(b.min.x + offset, Random.Range(b.min.y, b.max.y), 0f);
+            case 1: return new Vector3(b.max.x - offset, Random.Range(b.min.y, b.max.y), 0f);
+            case 2: return new Vector3(Random.Range(b.min.x, b.max.x), b.max.y - offset, 0f);
+            default: return new Vector3(Random.Range(b.min.x, b.max.x), b.min.y + offset, 0f);
+        }
     }
 
     private Bounds GetCameraBounds()
     {
         var cam = Camera.main;
-        if (cam == null)
-            return new Bounds();
-
+        if (cam == null) return new Bounds(Vector3.zero, Vector3.one * 10f);
         float height = cam.orthographicSize * 2f;
         float width = height * cam.aspect;
-        return new Bounds(cam.transform.position,
-                          new Vector3(width, height, 0f));
+        return new Bounds(cam.transform.position, new Vector3(width, height, 0f));
     }
 
-    /// <summary>
-    /// Call this when an enemy dies.
-    /// </summary>
     public void RegisterKill()
     {
         enemiesDefeated++;
+        // if you have RunMetrics:
+        RunMetrics.Instance?.RegisterKill();
     }
 
-    /// <summary>
-    /// Increases over time and per kill to ramp difficulty.
-    /// </summary>
-    float GetDifficultyMultiplier()
+    private float GetDifficultyMultiplier()
     {
-        float timeFactor = (Time.time - startTime) / 60f;  // +1 per minute
-        float killFactor = enemiesDefeated * 0.1f;         // +0.1 per kill
+        float timeFactor = (Time.time - startTime) / 60f;     // +1 per minute
+        float killFactor = enemiesDefeated * 0.1f;            // +0.1 per kill
         return 1f + timeFactor + killFactor;
     }
 }

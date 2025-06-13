@@ -170,7 +170,7 @@ MonoBehaviour:
   experienceReward: 1
   xpPickupPrefab: {fileID: 8365154387049940543, guid: 2a2e33d7d9298d5458fce91be3aa10ce, type: 3}
   healthPickupPrefab: {fileID: 8365154387049940543, guid: 9ca8565c5e857f74d920b1cd31d620c3, type: 3}
-  healthDropChance: 0.2
+  healthDropChance: 0.1
   damageTextPrefab: {fileID: 0}
 --- !u!114 &-5090483732443940068
 MonoBehaviour:

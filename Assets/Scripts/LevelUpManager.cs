@@ -7,14 +7,9 @@ public class LevelUpManager : MonoBehaviour
     public static LevelUpManager Instance { get; private set; }
 
     [Header("UI References")]
-    public GameObject levelUpPanel;       // Drag in your LevelUpPanel
-    public Transform buttonContainer;    // Drag in your ButtonContainer (Transform)
-    public GameObject optionButtonPrefab; // Drag in your OptionButton prefab
-
-    // Local multipliers (reset each run)
-    private float damageMultiplier = 1f;
-    private float xpGainMultiplierLocal = 1f;
-    private float speedMultiplierLocal = 1f;
+    public GameObject levelUpPanel;        // Your panel GameObject
+    public Transform buttonContainer;     // Container transform for option buttons
+    public GameObject optionButtonPrefab; // A prefab with a Button + child Text
 
     void Awake()
     {
@@ -22,75 +17,106 @@ public class LevelUpManager : MonoBehaviour
         else { Destroy(gameObject); return; }
     }
 
-    /// <summary>
-    /// Call to pause the game and show three choice buttons.
-    /// </summary>
     public void ShowLevelUpOptions(List<string> options)
     {
-        // Pause everything
         Time.timeScale = 0f;
         levelUpPanel.SetActive(true);
 
-        // Clear old buttons
+        // clear old
         foreach (Transform t in buttonContainer)
             Destroy(t.gameObject);
 
-        // Create new buttons
-        foreach (string opt in options)
+        // make new
+        foreach (var opt in options)
         {
-            var buttonGO = Instantiate(optionButtonPrefab, buttonContainer);
-            buttonGO.GetComponentInChildren<Text>().text = opt;
-            buttonGO.GetComponent<Button>()
-                .onClick.AddListener(() =>
-                {
-                    ApplyUpgrade(opt);
-                    HideLevelUpOptions();
-                });
+            string choice = opt; // capture for the lambda
+            var go = Instantiate(optionButtonPrefab, buttonContainer);
+            go.GetComponentInChildren<Text>().text = choice;
+            go.GetComponent<Button>()
+              .onClick.AddListener(() =>
+              {
+                  ApplyUpgrade(choice);
+                  HideLevelUpOptions();
+              });
         }
     }
 
-    /// <summary>
-    /// Hide panel and resume the game.
-    /// </summary>
     private void HideLevelUpOptions()
     {
         levelUpPanel.SetActive(false);
         Time.timeScale = 1f;
     }
 
-    /// <summary>
-    /// Parse the choice string and apply the corresponding buff.
-    /// </summary>
     private void ApplyUpgrade(string choice)
     {
-        var player = GameObject.FindGameObjectWithTag("Player");
+        var player = GameObject.FindWithTag("Player");
         if (player == null) return;
 
-        if (choice.Contains("Damage"))
+        var stats = player.GetComponent<PlayerStats>();
+        var xp = player.GetComponent<PlayerExperience>();
+        var mv = player.GetComponent<PlayerMovement>();
+        var ph = player.GetComponent<PlayerHealth>();
+
+        switch (choice)
         {
-            damageMultiplier *= 1.1f;
-            var atk = player.GetComponent<PlayerAttack>();
-            if (atk != null)
-                atk.damage = Mathf.RoundToInt(atk.damage * 1.1f);
-        }
-        else if (choice.Contains("XP Gain"))
-        {
-            xpGainMultiplierLocal *= 1.15f;
-            var xp = player.GetComponent<PlayerExperience>();
-            if (xp != null)
-                xp.xpGainMultiplier = xpGainMultiplierLocal;
-        }
-        else if (choice.Contains("Move Speed"))
-        {
-            speedMultiplierLocal *= 1.1f;
-            var mv = player.GetComponent<PlayerMovement>();
-            if (mv != null)
+            case "+1 Extra Projectile":
+                stats.extraProjectiles++;
+                break;
+
+            case "+10% Attack Speed":
+                stats.fireRateMultiplier *= 1.1f;
+                break;
+
+            case "+10% Damage":
+                stats.damageMultiplier *= 1.1f;
+                break;
+
+            case "+15% Critical Strike Chance":
+                stats.critChance += 0.15f;
+                break;
+
+            case "+150% Critical Damage":
+                stats.critMultiplier += 1.5f;
+                break;
+
+            case "Piercing Bullets":
+                stats.piercingBullets = true;
+                break;
+
+            case "+20% Health Regeneration":
+                stats.healthRegenPerSec += ph.maxHealth * 0.20f;
+                break;
+
+            case "5% Life Steal":
+                stats.lifeStealFraction += 0.05f;
+                break;
+
+            case "Shield (2 hits)":
+                stats.shieldHits += 2;
+                break;
+
+            case "Unlock Dash Ability":
+                stats.dashUnlocked = true;
+                break;
+
+            case "+10% XP Gain":
+                xp.xpGainMultiplier *= 1.1f;
+                break;
+
+            case "+10% Move Speed":
                 mv.moveSpeed *= 1.1f;
+                break;
+
+            case "Kill: AoE Blast":
+            case "On Hit: 10% Stun":
+                Debug.LogWarning($"Upgrade '{choice}' not implemented yet.");
+                break;
+
+            default:
+                Debug.LogWarning($"Unknown upgrade: {choice}");
+                break;
         }
 
-        Debug.Log($"Applied upgrade [{choice}]. " +
-                  $"DMG×{damageMultiplier:F2}, " +
-                  $"XP×{xpGainMultiplierLocal:F2}, " +
-                  $"SPD×{speedMultiplierLocal:F2}");
+        Debug.Log($"Applied upgrade: {choice}");
     }
 }

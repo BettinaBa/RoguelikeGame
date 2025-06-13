@@ -1,31 +1,33 @@
-using UnityEngine;
+﻿using UnityEngine;
 
-[RequireComponent(typeof(Rigidbody2D))]
+[RequireComponent(typeof(Rigidbody2D), typeof(Collider2D))]
 public class EnemyAI : MonoBehaviour
 {
-    public float chaseRange = 8f;         // increased default
-    public float attackRange = 1.5f;      // bump this up if needed
+    [Header("Movement & Detection")]
+    public float chaseRange = 8f;
     public float moveSpeed = 2f;
-    public float attackCooldown = 1f;
-    public int damage = 1;
     public float patrolChangeInterval = 2f;
 
+    [Header("Combat")]
+    public float attackCooldown = 1f;
+    public int damage = 1;
+
     [Header("Collision Layers")]
-    public LayerMask playerLayer;         // set this to only include your Player's Layer
+    public LayerMask playerLayer;  // set this to only include your Player layer
 
-    private Transform player;
-    private Rigidbody2D rb;
-    private float lastAttackTime;
+    Rigidbody2D rb;
+    Transform player;
+    Vector2 patrolDir;
+    float nextPatrolChange;
+    float lastAttackTime;
 
-    private enum State { Idle, Patrol, Chase, Attack }
-    private State currentState = State.Idle;
-    private Vector2 patrolDirection;
-    private float nextPatrolChange;
+    enum State { Patrol, Chase }
+    State currentState = State.Patrol;
 
     void Start()
     {
-        player = GameObject.FindGameObjectWithTag("Player")?.transform;
         rb = GetComponent<Rigidbody2D>();
+        player = GameObject.FindGameObjectWithTag("Player")?.transform;
         ChooseNewPatrolDirection();
     }
 
@@ -34,24 +36,21 @@ public class EnemyAI : MonoBehaviour
         if (GameOverManager.Instance != null && GameOverManager.Instance.IsGameOver) return;
         if (player == null) return;
 
-        float distance = Vector2.Distance(player.position, transform.position);
-        switch (currentState)
-        {
-            case State.Idle:
-                currentState = State.Patrol;
-                break;
-            case State.Patrol:
-                if (distance <= chaseRange) currentState = State.Chase;
-                if (Time.time >= nextPatrolChange) ChooseNewPatrolDirection();
-                break;
-            case State.Chase:
-                if (distance <= attackRange) currentState = State.Attack;
-                else if (distance > chaseRange) currentState = State.Patrol;
-                break;
-            case State.Attack:
-                if (distance > attackRange) currentState = State.Chase;
-                break;
-        }
+        float dist = Vector2.Distance(player.position, transform.position);
+
+        // switch states
+        if (currentState == State.Patrol && dist <= chaseRange)
+            currentState = State.Chase;
+        else if (currentState == State.Chase && dist > chaseRange)
+            currentState = State.Patrol;
+
+        // record chase time
+        if (currentState == State.Chase)
+            RunMetrics.Instance?.RecordChase(Time.deltaTime);
+
+        // change patrol direction occasionally
+        if (currentState == State.Patrol && Time.time >= nextPatrolChange)
+            ChooseNewPatrolDirection();
     }
 
     void FixedUpdate()
@@ -59,52 +58,61 @@ public class EnemyAI : MonoBehaviour
         if (GameOverManager.Instance != null && GameOverManager.Instance.IsGameOver) return;
         if (player == null) return;
 
-        switch (currentState)
+        if (currentState == State.Patrol)
+            rb.MovePosition(rb.position + patrolDir * moveSpeed * Time.fixedDeltaTime);
+        else // Chase
         {
-            case State.Patrol:
-                rb.MovePosition(rb.position + patrolDirection * moveSpeed * Time.fixedDeltaTime);
-                break;
-            case State.Chase:
-                Vector2 dir = ((Vector2)player.position - rb.position).normalized;
-                rb.MovePosition(rb.position + dir * moveSpeed * Time.fixedDeltaTime);
-                break;
-            case State.Attack:
-                TryAttack();
-                break;
-        }
-    }
-
-    void TryAttack()
-    {
-        if (Time.time < lastAttackTime + attackCooldown) return;
-        lastAttackTime = Time.time;
-
-        Debug.Log($"Enemy '{name}' TryAttack from {transform.position} (r={attackRange})");
-
-        // Only check against colliders on the Player layer
-        Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, attackRange, playerLayer);
-        foreach (var hit in hits)
-        {
-            Debug.Log(" --> Attack hit: " + hit.name);
-            PlayerHealth ph = hit.GetComponent<PlayerHealth>();
-            if (ph != null)
-                ph.TakeDamage(damage);
+            Vector2 dir = ((Vector2)player.position - rb.position).normalized;
+            rb.MovePosition(rb.position + dir * moveSpeed * Time.fixedDeltaTime);
         }
     }
 
     void ChooseNewPatrolDirection()
     {
-        float angle = Random.Range(0f, Mathf.PI * 2f);
-        patrolDirection = new Vector2(Mathf.Cos(angle), Mathf.Sin(angle));
+        float ang = Random.Range(0f, Mathf.PI * 2f);
+        patrolDir = new Vector2(Mathf.Cos(ang), Mathf.Sin(ang));
         nextPatrolChange = Time.time + patrolChangeInterval;
+    }
+
+    // Called once when we begin touching
+    void OnCollisionEnter2D(Collision2D col)
+    {
+        TryDealMelee(col.collider);
+    }
+
+    // Called every physics frame while touching
+    void OnCollisionStay2D(Collision2D col)
+    {
+        // record attack time while in contact
+        if (((1 << col.gameObject.layer) & playerLayer) != 0)
+            RunMetrics.Instance?.RecordAttack(Time.fixedDeltaTime);
+
+        TryDealMelee(col.collider);
+    }
+
+    void TryDealMelee(Collider2D col)
+    {
+        // only if this collider is on our playerLayer
+        if (((1 << col.gameObject.layer) & playerLayer) == 0)
+            return;
+
+        // enforce cooldown
+        if (Time.time < lastAttackTime + attackCooldown)
+            return;
+        lastAttackTime = Time.time;
+
+        // deal damage
+        var ph = col.GetComponent<PlayerHealth>();
+        if (ph != null)
+        {
+            Debug.Log($"[{name}] melee hit for {damage}");
+            ph.TakeDamage(damage);
+        }
     }
 
     void OnDrawGizmosSelected()
     {
-        // visualize chase and attack ranges in the Scene view
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(transform.position, chaseRange);
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, attackRange);
     }
 }

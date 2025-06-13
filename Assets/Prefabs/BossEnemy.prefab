@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 2026848764904998958}
   - component: {fileID: -7827119864390000583}
   m_Layer: 3
-  m_Name: Enemy
+  m_Name: BossEnemy
   m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -31,7 +31,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 2.56, y: 0.5, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 1.25, y: 1.25, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -80,8 +80,8 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: -2413806693520163455, guid: a86470a33a6bf42c4b3595704624658b, type: 3}
-  m_Color: {r: 0.7433963, g: 0.16130286, b: 0.16130286, a: 1}
+  m_Sprite: {fileID: -2413806693520163455, guid: 4adeaf2d2b1c7417e89f026626d8264f, type: 3}
+  m_Color: {r: 0.41960785, g: 0.27450982, b: 0.16130286, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -166,11 +166,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2706409e21ea58f48abcc038d47aa138, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 3
-  experienceReward: 1
+  maxHealth: 60
+  experienceReward: 20
   xpPickupPrefab: {fileID: 8365154387049940543, guid: 2a2e33d7d9298d5458fce91be3aa10ce, type: 3}
   healthPickupPrefab: {fileID: 8365154387049940543, guid: 9ca8565c5e857f74d920b1cd31d620c3, type: 3}
-  healthDropChance: 0.1
+  healthDropChance: 0
   damageTextPrefab: {fileID: 0}
 --- !u!114 &-7827119864390000583
 MonoBehaviour:
@@ -184,8 +184,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e74b5e6ecae44530aa30b03928efb4d5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  chaseRange: 10
-  moveSpeed: 2
+  chaseRange: 200
+  moveSpeed: 1.58
   patrolChangeInterval: 2
   attackCooldown: 1
   damage: 1

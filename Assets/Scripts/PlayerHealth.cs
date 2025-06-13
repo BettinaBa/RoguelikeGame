@@ -1,63 +1,69 @@
-using UnityEngine;
+﻿using UnityEngine;
 
+[RequireComponent(typeof(Collider2D))]
 public class PlayerHealth : MonoBehaviour
 {
-    [Tooltip("Base health of the player; will be overridden by any permanent upgrades.")]
+    [Tooltip("Base health of the player; overridden by permanent upgrades.")]
     public int maxHealth = 5;
     private int currentHealth;
 
-    [Tooltip("Prefab for floating damage text.")]
+    [Tooltip("Floating damage text prefab.")]
     public FloatingDamageText damageTextPrefab;
 
-    /// <summary>
-    /// Exposes current health for UI.
-    /// </summary>
     public int CurrentHealth => currentHealth;
 
     void Start()
     {
-        // Apply any permanent +MaxHP upgrades from PlayerPrefs:
-        //   Meta_MaxHP key holds the actual max health (defaults to whatever you set in the inspector).
+        // Load permanent MaxHP (Meta_MaxHP)
         maxHealth = PlayerPrefs.GetInt("Meta_MaxHP", maxHealth);
-
         currentHealth = maxHealth;
         UpdateUI();
     }
 
     public void TakeDamage(int amount)
     {
-        Debug.Log($"TakeDamage called: HP before = {currentHealth}, damage = {amount}");
+        // Register into run metrics
+        RunMetrics.Instance?.RegisterDamage(amount);
+
+        // Handle shield hits first
+        var stats = GetComponent<PlayerStats>();
+        if (stats != null && stats.shieldHits > 0)
+        {
+            stats.shieldHits--;
+            Debug.Log($"Shield blocked! Remaining: {stats.shieldHits}");
+            return;
+        }
+
+        Debug.Log($"TakeDamage: before={currentHealth}, dmg={amount}");
         currentHealth -= amount;
-        Debug.Log("Player Health: " + currentHealth);
+
         if (damageTextPrefab != null)
         {
-            var text = Instantiate(damageTextPrefab, transform.position, Quaternion.identity);
-            text.Setup(amount);
+            var txt = Instantiate(damageTextPrefab, transform.position, Quaternion.identity);
+            txt.Setup(amount);
         }
+
         UpdateUI();
 
         if (currentHealth <= 0)
-        {
-            Debug.Log("Player Died! Calling OnDeath()");
             OnDeath();
-        }
     }
 
     void OnDeath()
     {
-        if (GameOverManager.Instance != null)
-            GameOverManager.Instance.GameOver();
+        Debug.Log("Player died → Game Over");
+        GameOverManager.Instance?.GameOver();
     }
 
     public void Heal(int amount)
     {
         currentHealth = Mathf.Min(currentHealth + amount, maxHealth);
-        Debug.Log("Player Health: " + currentHealth);
+        Debug.Log($"Healed to {currentHealth}/{maxHealth}");
         UpdateUI();
     }
 
     void UpdateUI()
     {
-        // Leave empty if your UIUpdater is polling CurrentHealth each frame
+        // left empty if your UIUpdater polls CurrentHealth
     }
 }

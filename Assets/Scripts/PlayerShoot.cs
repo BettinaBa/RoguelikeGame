@@ -1,58 +1,75 @@
 using UnityEngine;
 
+[RequireComponent(typeof(Rigidbody2D))]
 public class PlayerShoot : MonoBehaviour
 {
     [Header("References")]
-    [Tooltip("Bullet prefab for the player")]
     public GameObject bulletPrefab;
 
     [Header("Shooting Settings")]
-    [Tooltip("Shots per second")]
-    public float fireRate = 3f;
-    [Tooltip("Speed of the player bullet")]
+    public float baseFireRate = 3f;
     public float bulletSpeed = 15f;
-    [Tooltip("How far from the player to spawn the bullet")]
     public float spawnOffset = 0.6f;
+    [Tooltip("Spread angle between extra projectiles")]
+    public float spreadAngle = 15f;
 
-    private float nextFireTime;
+    float nextFireTime;
+    PlayerStats stats;
+
+    void Awake()
+    {
+        stats = GetComponent<PlayerStats>();
+    }
 
     void Update()
     {
         if (GameOverManager.Instance != null && GameOverManager.Instance.IsGameOver)
             return;
 
-        // Right-click (1) to shoot
-        if (Input.GetMouseButton(1) && Time.time >= nextFireTime)
+        if (Input.GetMouseButton(1))
         {
-            nextFireTime = Time.time + 1f / fireRate;
-            ShootTowardsMouse();
+            float effectiveRate = baseFireRate * (stats?.fireRateMultiplier ?? 1f);
+            if (Time.time >= nextFireTime)
+            {
+                nextFireTime = Time.time + 1f / effectiveRate;
+                ShootTowardsMouse();
+            }
         }
     }
 
-    private void ShootTowardsMouse()
+    void ShootTowardsMouse()
     {
-        Debug.Log("Shoot!");
-
-        // Get the mouse world position
         Vector3 mouseWorld = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         mouseWorld.z = 0f;
-
-        // Direction from player to mouse
         Vector2 dir = ((Vector2)mouseWorld - (Vector2)transform.position).normalized;
 
-        // Compute spawn position just outside the player
-        Vector3 spawnPos = transform.position + (Vector3)(dir * spawnOffset);
+        // how many bullets?
+        int count = 1 + (stats?.extraProjectiles ?? 0);
+        float halfSpread = spreadAngle * (count - 1) * 0.5f;
 
-        // **Force Z to 2 so it's drawn over floor (Z=1)**
-        spawnPos.z = 2f;
+        for (int i = 0; i < count; i++)
+        {
+            float angle = -halfSpread + spreadAngle * i;
+            Quaternion rot = Quaternion.Euler(0, 0, Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg - 90f + angle);
+            Vector3 spawnPos = transform.position + rot * Vector3.up * spawnOffset;
+            spawnPos.z = 2f;
 
-        // Instantiate and orient the bullet
-        Quaternion rot = Quaternion.FromToRotation(Vector3.up, dir);
-        GameObject bullet = Instantiate(bulletPrefab, spawnPos, rot);
+            GameObject b = Instantiate(bulletPrefab, spawnPos, rot);
+            var rb = b.GetComponent<Rigidbody2D>();
+            if (rb != null)
+                rb.linearVelocity = rot * Vector3.up * bulletSpeed;
 
-        // Give it velocity
-        Rigidbody2D rb = bullet.GetComponent<Rigidbody2D>();
-        if (rb != null)
-            rb.linearVelocity = dir * bulletSpeed;
+            // pass stats into the bullet
+            var pb = b.GetComponent<PlayerBullet>();
+            if (pb != null && stats != null)
+            {
+                pb.damage = Mathf.RoundToInt(pb.damage * stats.damageMultiplier);
+                pb.critChance = stats.critChance;
+                pb.critMultiplier = stats.critMultiplier;
+                pb.lifeStealFrac = stats.lifeStealFraction;
+                pb.piercing = stats.piercingBullets;
+                pb.shieldHits = stats.shieldHits;
+            }
+        }
     }
 }

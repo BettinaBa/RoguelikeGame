@@ -6,15 +6,13 @@ public class EnemyHealth : MonoBehaviour
     public int maxHealth = 3;
     private int currentHealth;
 
-    [Header("Reward Pickups")]
-    [Tooltip("How much XP this enemy gives")]
-    public int experienceReward = 1;
-    [Tooltip("Prefab for the XP orb")]
+    [Header("Drop Settings")]
+    [Tooltip("XP orb prefab")]
     public GameObject xpPickupPrefab;
-    [Tooltip("Prefab for the health pickup (e.g. heart)")]
+    [Tooltip("Health pickup prefab")]
     public GameObject healthPickupPrefab;
-    [Range(0f, 1f), Tooltip("Chance to drop health instead of XP")]
-    public float healthDropChance = 0.2f;
+    [Range(0f, 1f)] public float healthDropChance = 0.2f;
+    public int experienceReward = 1;
 
     [Header("Feedback")]
     public FloatingDamageText damageTextPrefab;
@@ -27,52 +25,38 @@ public class EnemyHealth : MonoBehaviour
     public void TakeDamage(int amount)
     {
         currentHealth -= amount;
-        Debug.Log($"Enemy Health: {currentHealth}");
+        Debug.Log($"Enemy HP: {currentHealth}/{maxHealth}");
 
-        // Show floating damage text
         if (damageTextPrefab != null)
         {
-            var text = Instantiate(
-                damageTextPrefab,
-                transform.position,
-                Quaternion.identity);
-            text.Setup(amount);
+            var txt = Instantiate(damageTextPrefab, transform.position, Quaternion.identity);
+            txt.Setup(amount);
         }
 
         if (currentHealth <= 0)
-        {
-            SpawnPickup();
-            Destroy(gameObject);
-
-            if (DifficultyManager.Instance != null)
-                DifficultyManager.Instance.RegisterKill();
-
-            // If you’re using RoomGenerator directly:
-            var rg = FindAnyObjectByType<RoomGenerator>();
-            if (rg != null)
-                rg.RegenerateRoom();
-        }
+            Die();
     }
 
-    private void SpawnPickup()
+    void Die()
     {
-        // Randomly choose heart or XP
+        // 1) Spawn health or XP
         if (Random.value < healthDropChance && healthPickupPrefab != null)
-        {
-            Instantiate(
-                healthPickupPrefab,
-                transform.position,
-                Quaternion.identity);
-        }
+            Instantiate(healthPickupPrefab, transform.position, Quaternion.identity);
         else if (xpPickupPrefab != null)
         {
-            var pickupObj = Instantiate(
-                xpPickupPrefab,
-                transform.position,
-                Quaternion.identity);
-            var pickup = pickupObj.GetComponent<Pickup>();
-            if (pickup != null)
-                pickup.amount = experienceReward;
+            var orb = Instantiate(xpPickupPrefab, transform.position, Quaternion.identity);
+            if (orb.TryGetComponent<Pickup>(out var p))
+                p.amount = experienceReward;
         }
+
+        // 2) Register kill
+        DifficultyManager.Instance?.RegisterKill();
+
+        // 3) Tear down
+        Destroy(gameObject);
+
+        // 4) Regenerate room if needed
+        var rg = FindAnyObjectByType<RoomGenerator>();
+        if (rg != null) rg.RegenerateRoom();
     }
 }
