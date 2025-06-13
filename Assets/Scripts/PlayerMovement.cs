@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+using UnityEngine;
+using UnityEngine.InputSystem; // for InputValue events
 
 [RequireComponent(typeof(Rigidbody2D))]
 public class PlayerMovement : MonoBehaviour
@@ -14,6 +15,7 @@ public class PlayerMovement : MonoBehaviour
 
     private Rigidbody2D rb;
     private Vector2 moveInput;
+    private Vector2 lastMoveDir = Vector2.right; // remembers last non-zero input
     private float lastDashTime = -Mathf.Infinity;
     private PlayerStats stats;
 
@@ -28,24 +30,39 @@ public class PlayerMovement : MonoBehaviour
 
     void Update()
     {
-        // WASD via explicit key checks in case axes aren't configured
-        moveInput = Vector2.zero;
-        if (Input.GetKey(KeyCode.A)) moveInput.x -= 1f;
-        if (Input.GetKey(KeyCode.D)) moveInput.x += 1f;
-        if (Input.GetKey(KeyCode.S)) moveInput.y -= 1f;
-        if (Input.GetKey(KeyCode.W)) moveInput.y += 1f;
-        moveInput.Normalize();
+        // Legacy Input fallback (WASD)
+        Vector2 legacy = Vector2.zero;
+        if (Input.GetKey(KeyCode.A)) legacy.x -= 1f;
+        if (Input.GetKey(KeyCode.D)) legacy.x += 1f;
+        if (Input.GetKey(KeyCode.S)) legacy.y -= 1f;
+        if (Input.GetKey(KeyCode.W)) legacy.y += 1f;
 
-        // Space → dash
-        if (stats != null
-            && stats.dashUnlocked
-            && Input.GetKeyDown(KeyCode.Space)
-            && Time.time >= lastDashTime + dashCooldown)
+        if (legacy.sqrMagnitude > 0f)
         {
-            lastDashTime = Time.time;
-            if (moveInput.sqrMagnitude > 0f)
-                rb.MovePosition(rb.position + moveInput * dashDistance);
+            moveInput = legacy.normalized;
+            lastMoveDir = moveInput;
         }
+    }
+
+    // Input System callback
+    public void OnMove(InputValue value)
+    {
+        moveInput = value.Get<Vector2>();
+        moveInput.Normalize();
+        if (moveInput.sqrMagnitude > 0f)
+            lastMoveDir = moveInput;
+    }
+
+    // Input System callback for Jump (used as Dash)
+    public void OnJump(InputValue value)
+    {
+        if (!value.isPressed) return;
+        if (stats == null || !stats.dashUnlocked) return;
+        if (Time.time < lastDashTime + dashCooldown) return;
+
+        lastDashTime = Time.time;
+        Vector2 dir = moveInput.sqrMagnitude > 0f ? moveInput : lastMoveDir;
+        rb.MovePosition(rb.position + dir.normalized * dashDistance);
     }
 
     void FixedUpdate()
