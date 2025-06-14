@@ -62,7 +62,7 @@ public class BehaviorEnemyAI : MonoBehaviour
         if (Time.time >= nextPatrolChange)
             ChooseNewPatrolDirection();
 
-        if (agent != null)
+        if (agent != null && agent.isOnNavMesh)
             agent.isStopped = true;
         rb.MovePosition(rb.position + patrolDir * moveSpeed * Time.deltaTime);
         return BTNode.State.Running;
@@ -77,7 +77,7 @@ public class BehaviorEnemyAI : MonoBehaviour
         if (dist <= attackRange)
             return BTNode.State.Success;
 
-        if (agent != null)
+        if (agent != null && agent.isOnNavMesh)
         {
             agent.isStopped = false;
             agent.SetDestination(player.position);
@@ -110,7 +110,7 @@ public class BehaviorEnemyAI : MonoBehaviour
         if (player == null) return BTNode.State.Failure;
         if (Time.time >= retreatEnd)
             return BTNode.State.Success;
-        if (agent != null)
+        if (agent != null && agent.isOnNavMesh)
             agent.isStopped = true;
         Vector2 dir = ((Vector2)transform.position - (Vector2)player.position).normalized;
         rb.MovePosition(rb.position + dir * moveSpeed * Time.deltaTime);
