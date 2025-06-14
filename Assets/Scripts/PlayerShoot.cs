@@ -57,6 +57,7 @@ public class PlayerShoot : MonoBehaviour
             spawnPos.z = 2f;
 
             GameObject b = Instantiate(bulletPrefab, spawnPos, rot);
+            RunMetrics.Instance?.RegisterShot();
             var rb = b.GetComponent<Rigidbody2D>();
             if (rb != null)
                 rb.linearVelocity = rot * Vector3.up * bulletSpeed;

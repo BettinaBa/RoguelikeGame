@@ -30,6 +30,8 @@ public class PlayerBullet : MonoBehaviour
         var eh = other.GetComponent<EnemyHealth>();
         if (eh == null) return;
 
+        RunMetrics.Instance?.RegisterHit();
+
         // 1) Calculate crit
         int finalDmg = damage;
         if (Random.value < critChance)

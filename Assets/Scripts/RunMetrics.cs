@@ -14,6 +14,11 @@ public class RunMetrics : MonoBehaviour
     [HideInInspector] public float timeInChase = 0f;
     [HideInInspector] public float timeInAttack = 0f;
 
+    // New metrics for accuracy and kill time
+    [HideInInspector] public int shotsFired = 0;
+    [HideInInspector] public int shotsHit = 0;
+    [HideInInspector] public float totalKillTime = 0f;
+
     void Awake()
     {
         if (Instance == null)
@@ -60,6 +65,40 @@ public class RunMetrics : MonoBehaviour
     {
         timeInAttack += deltaSeconds;
     }
+
+    /// <summary>
+    /// Call when the player fires a projectile.
+    /// </summary>
+    public void RegisterShot()
+    {
+        shotsFired++;
+    }
+
+    /// <summary>
+    /// Call when a projectile successfully hits an enemy.
+    /// </summary>
+    public void RegisterHit()
+    {
+        shotsHit++;
+    }
+
+    /// <summary>
+    /// Record the time from spawn to kill for an enemy.
+    /// </summary>
+    public void RegisterKillTime(float seconds)
+    {
+        totalKillTime += seconds;
+    }
+
+    /// <summary>
+    /// Current shot accuracy ratio (0-1).
+    /// </summary>
+    public float Accuracy => shotsFired > 0 ? (float)shotsHit / shotsFired : 0f;
+
+    /// <summary>
+    /// Average time it takes to kill an enemy.
+    /// </summary>
+    public float AverageKillTime => kills > 0 ? totalKillTime / kills : 0f;
 
     /// <summary>
     /// Optional hook to snapshot or process metrics before sampling.
