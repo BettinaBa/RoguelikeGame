@@ -48,7 +48,7 @@ public class EnemyAI : MonoBehaviour
         if (stunTimer > 0f)
         {
             stunTimer -= Time.deltaTime;
-            if (agent != null)
+            if (agent != null && agent.isOnNavMesh)
                 agent.isStopped = true;
             return;
         }
@@ -61,14 +61,14 @@ public class EnemyAI : MonoBehaviour
         else if (currentState == State.Chase && dist > chaseRange)
             currentState = State.Patrol;
 
-        if (agent != null)
+        if (agent != null && agent.isOnNavMesh)
             agent.isStopped = currentState != State.Chase;
 
         // record chase time
         if (currentState == State.Chase)
         {
             RunMetrics.Instance?.RecordChase(Time.deltaTime);
-            if (agent != null)
+            if (agent != null && agent.isOnNavMesh)
                 agent.SetDestination(player.position);
         }
 
@@ -87,13 +87,13 @@ public class EnemyAI : MonoBehaviour
 
         if (currentState == State.Patrol)
         {
-            if (agent != null)
+            if (agent != null && agent.isOnNavMesh)
                 agent.isStopped = true;
             rb.MovePosition(rb.position + patrolDir * moveSpeed * Time.fixedDeltaTime);
         }
         else // Chase
         {
-            if (agent != null)
+            if (agent != null && agent.isOnNavMesh)
             {
                 agent.isStopped = false;
                 agent.SetDestination(player.position);
