@@ -9,6 +9,7 @@ public class DifficultyManager : MonoBehaviour
     public GameObject shooterPrefab;
     public GameObject teleporterPrefab;
     public GameObject advancedPrefab;
+    public GameObject behaviorPrefab;
     [Tooltip("Prefab for the mini-boss.")]
     public GameObject bossPrefab;
     [Tooltip("Seconds until boss appears.")]
@@ -77,14 +78,16 @@ public class DifficultyManager : MonoBehaviour
     {
         GameObject prefab;
         float roll = Random.value;
-        if (roll < 0.25f)
+        if (roll < 0.2f)
             prefab = meleePrefab;
-        else if (roll < 0.5f)
+        else if (roll < 0.4f)
             prefab = shooterPrefab;
-        else if (roll < 0.75f)
+        else if (roll < 0.6f)
             prefab = teleporterPrefab;
-        else
+        else if (roll < 0.8f)
             prefab = advancedPrefab;
+        else
+            prefab = behaviorPrefab;
         if (prefab == null) return;
 
         Vector3 pos = GetEdgeSpawnPosition();
@@ -101,6 +104,8 @@ public class DifficultyManager : MonoBehaviour
             ai.moveSpeed *= slowRamp;
         else if (enemy.TryGetComponent<AdvancedEnemyAI>(out var adv))
             adv.moveSpeed *= slowRamp;
+        else if (enemy.TryGetComponent<BehaviorEnemyAI>(out var btree))
+            btree.moveSpeed *= slowRamp;
 
         // leave damage untouched
     }
