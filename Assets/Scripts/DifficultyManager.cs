@@ -34,6 +34,12 @@ public class DifficultyManager : MonoBehaviour
     [Tooltip("Multiplier added per second faster kill time.")]
     public float killTimeWeight = 1f;
 
+    [Header("Difficulty Curve")]
+    [Tooltip("Growth rate for the logistic difficulty curve.")]
+    public float growthRate = 0.5f;
+    [Tooltip("Midpoint for the logistic difficulty curve.")]
+    public float midpoint = 10f;
+
     private float nextSpawnTime;
     private bool bossSpawned = false;
     private int enemiesDefeated;
@@ -196,6 +202,8 @@ public class DifficultyManager : MonoBehaviour
                 killTimeFactor = killTimeWeight / m.AverageKillTime;
         }
 
-        return 1f + timeFactor + killFactor + damageFactor + chaseFactor + accuracyFactor + killTimeFactor;
+        float linearScore = timeFactor + killFactor + damageFactor + chaseFactor + accuracyFactor + killTimeFactor;
+        float logistic = 1f / (1f + Mathf.Exp(-growthRate * (linearScore - midpoint)));
+        return 1f + logistic;
     }
 }
