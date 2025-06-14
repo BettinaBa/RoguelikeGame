@@ -108,8 +108,11 @@ public class LevelUpManager : MonoBehaviour
                 break;
 
             case "Kill: AoE Blast":
-            case "On Hit: 10% Stun":
                 Debug.LogWarning($"Upgrade '{choice}' not implemented yet.");
+                break;
+
+            case "On Hit: 10% Stun":
+                stats.stunChance = 0.10f;
                 break;
 
             default:

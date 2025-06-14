@@ -20,6 +20,7 @@ public class EnemyAI : MonoBehaviour
     Vector2 patrolDir;
     float nextPatrolChange;
     float lastAttackTime;
+    float stunTimer;
 
     enum State { Patrol, Chase }
     State currentState = State.Patrol;
@@ -35,6 +36,12 @@ public class EnemyAI : MonoBehaviour
     {
         if (GameOverManager.Instance != null && GameOverManager.Instance.IsGameOver) return;
         if (player == null) return;
+
+        if (stunTimer > 0f)
+        {
+            stunTimer -= Time.deltaTime;
+            return;
+        }
 
         float dist = Vector2.Distance(player.position, transform.position);
 
@@ -57,6 +64,9 @@ public class EnemyAI : MonoBehaviour
     {
         if (GameOverManager.Instance != null && GameOverManager.Instance.IsGameOver) return;
         if (player == null) return;
+
+        if (stunTimer > 0f)
+            return;
 
         if (currentState == State.Patrol)
             rb.MovePosition(rb.position + patrolDir * moveSpeed * Time.fixedDeltaTime);
@@ -114,5 +124,10 @@ public class EnemyAI : MonoBehaviour
     {
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(transform.position, chaseRange);
+    }
+
+    public void ApplyStun(float duration)
+    {
+        stunTimer = Mathf.Max(stunTimer, duration);
     }
 }
