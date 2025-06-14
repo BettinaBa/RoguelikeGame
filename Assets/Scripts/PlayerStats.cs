@@ -21,5 +21,8 @@ public class PlayerStats : MonoBehaviour
     public bool dashUnlocked = false;     // Unlock Dash Ability
     public float healthRegenPerSec = 0f;  // +20% Health Regen
 
+    [Header("Kill Effects")]
+    public bool killAoE = false;          // Trigger AoE burst on kill
+
     // (Optional) you can tick “Apply regen per second” in Update elsewhere
 }

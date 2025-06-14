@@ -52,6 +52,19 @@ public class EnemyHealth : MonoBehaviour
         // 2) Register kill
         DifficultyManager.Instance?.RegisterKill();
 
+        // Trigger AoE burst if player has the upgrade
+        var player = GameObject.FindWithTag("Player");
+        if (player != null)
+        {
+            var stats = player.GetComponent<PlayerStats>();
+            if (stats != null && stats.killAoE)
+            {
+                var prefab = Resources.Load<GameObject>("AoEBurst");
+                if (prefab != null)
+                    Instantiate(prefab, transform.position, Quaternion.identity);
+            }
+        }
+
         // 3) Tear down
         Destroy(gameObject);
 
