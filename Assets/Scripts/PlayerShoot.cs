@@ -63,15 +63,19 @@ public class PlayerShoot : MonoBehaviour
 
             // pass stats into the bullet
             var pb = b.GetComponent<PlayerBullet>();
-            if (pb != null && stats != null)
+            if (pb != null)
             {
-                pb.damage = Mathf.RoundToInt(pb.damage * stats.damageMultiplier);
-                pb.critChance = stats.critChance;
-                pb.critMultiplier = stats.critMultiplier;
-                pb.lifeStealFrac = stats.lifeStealFraction;
-                pb.stunChance = stats.stunChance;
-                pb.piercing = stats.piercingBullets;
-                pb.shieldHits = stats.shieldHits;
+                pb.owner = GetComponent<PlayerHealth>();
+                if (stats != null)
+                {
+                    pb.damage = Mathf.RoundToInt(pb.damage * stats.damageMultiplier);
+                    pb.critChance = stats.critChance;
+                    pb.critMultiplier = stats.critMultiplier;
+                    pb.lifeStealFrac = stats.lifeStealFraction;
+                    pb.stunChance = stats.stunChance;
+                    pb.piercing = stats.piercingBullets;
+                    pb.shieldHits = stats.shieldHits;
+                }
             }
         }
     }

@@ -5,6 +5,9 @@ public class PlayerBullet : MonoBehaviour
     [Tooltip("Base damage BEFORE multipliers")]
     public int damage = 1;
 
+    // reference back to the player that fired this bullet
+    public PlayerHealth owner;
+
     [HideInInspector] public float critChance = 0f;
     [HideInInspector] public float critMultiplier = 1f;
     [HideInInspector] public float lifeStealFrac = 0f;
@@ -36,8 +39,8 @@ public class PlayerBullet : MonoBehaviour
         eh.TakeDamage(finalDmg);
 
         // 3) Life steal
-        if (lifeStealFrac > 0f && TryGetComponent(out PlayerHealth ph))
-            ph.Heal(Mathf.RoundToInt(finalDmg * lifeStealFrac));
+        if (lifeStealFrac > 0f)
+            owner?.Heal(Mathf.RoundToInt(finalDmg * lifeStealFrac));
 
         // 4) Chance to stun
         if (stunChance > 0f && Random.value < stunChance)
