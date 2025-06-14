@@ -70,6 +70,9 @@ public class GameOverManager : MonoBehaviour
         recommendationText.text = $"Recommended next: {rec}";
         recommendationText.gameObject.SetActive(true);
 
+        // Log run metrics before showing the panel
+        RunMetricsLogger.WriteMetrics(earned);
+
         // Show the panel
         gameOverPanel.SetActive(true);
     }
