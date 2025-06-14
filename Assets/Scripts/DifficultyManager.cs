@@ -16,6 +16,16 @@ public class DifficultyManager : MonoBehaviour
     [Tooltip("Seconds between regular enemy spawns.")]
     public float spawnInterval = 5f;
 
+    [Header("Difficulty Weights")]
+    [Tooltip("Multiplier added per minute elapsed.")]
+    public float timeWeight = 1f;
+    [Tooltip("Multiplier added per enemy kill.")]
+    public float killWeight = 0.1f;
+    [Tooltip("Multiplier added per point of damage taken.")]
+    public float damageWeight = 0.05f;
+    [Tooltip("Weight for time spent chasing vs. attacking.")]
+    public float chaseWeight = 0.5f;
+
     private float nextSpawnTime;
     private bool bossSpawned = false;
     private int enemiesDefeated;
@@ -64,13 +74,15 @@ public class DifficultyManager : MonoBehaviour
         Vector3 pos = GetEdgeSpawnPosition();
         var enemy = Instantiate(prefab, pos, Quaternion.identity);
 
-        // **Only scale health**, and at half the usual rate
+        // Scale health and move speed using the difficulty multiplier
+        float ramp = GetDifficultyMultiplier();
+        float slowRamp = 1f + (ramp - 1f) * 0.5f;
+
         if (enemy.TryGetComponent<EnemyHealth>(out var eh))
-        {
-            float ramp = GetDifficultyMultiplier();
-            float slowRamp = 1f + (ramp - 1f) * 0.5f;
             eh.maxHealth = Mathf.RoundToInt(eh.maxHealth * slowRamp);
-        }
+
+        if (enemy.TryGetComponent<EnemyAI>(out var ai))
+            ai.moveSpeed *= slowRamp;
 
         // leave damage untouched
     }
@@ -142,8 +154,20 @@ public class DifficultyManager : MonoBehaviour
 
     private float GetDifficultyMultiplier()
     {
-        float timeFactor = (Time.time - startTime) / 60f;     // +1 per minute
-        float killFactor = enemiesDefeated * 0.1f;            // +0.1 per kill
-        return 1f + timeFactor + killFactor;
+        float elapsedMin = (Time.time - startTime) / 60f;
+        float timeFactor = elapsedMin * timeWeight;
+        float killFactor = enemiesDefeated * killWeight;
+
+        float damageFactor = 0f;
+        float chaseFactor = 0f;
+        var m = RunMetrics.Instance;
+        if (m != null)
+        {
+            damageFactor = m.damageTaken * damageWeight;
+            float ratio = m.timeInChase / Mathf.Max(1f, m.timeInAttack);
+            chaseFactor = ratio * chaseWeight;
+        }
+
+        return 1f + timeFactor + killFactor + damageFactor + chaseFactor;
     }
 }
