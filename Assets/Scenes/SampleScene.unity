@@ -2876,6 +2876,8 @@ MonoBehaviour:
   chaseWeight: 0.5
   accuracyWeight: 1
   killTimeWeight: 1
+  growthRate: 0.5
+  midpoint: 10
 --- !u!4 &1488817118
 Transform:
   m_ObjectHideFlags: 0
