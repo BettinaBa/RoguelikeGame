@@ -8,4 +8,7 @@ public class WeaponTemplate : ScriptableObject
     public float baseFireRate = 1f;
     [Tooltip("Default special effect for this weapon, e.g. Piercing")]
     public string specialEffect;
+
+    [Tooltip("Tags used by the LootSynergyManager to bias future drops")]
+    public string[] synergyTags;
 }
