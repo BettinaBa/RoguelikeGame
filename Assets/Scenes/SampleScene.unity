@@ -152,6 +152,9 @@ MonoBehaviour:
   damageTaken: 0
   timeInChase: 0
   timeInAttack: 0
+  shotsFired: 0
+  shotsHit: 0
+  totalKillTime: 0
 --- !u!4 &45954908
 Transform:
   m_ObjectHideFlags: 0
@@ -346,6 +349,8 @@ MonoBehaviour:
   moveSpeed: 5
   dashDistance: 3
   dashCooldown: 1
+  sprintMultiplier: 1.5
+  sprintCooldown: 0.5
 --- !u!58 &126443104
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -715,9 +720,11 @@ MonoBehaviour:
   critChance: 0
   critMultiplier: 2
   lifeStealFraction: 0
+  stunChance: 0
   fireRateMultiplier: 1
   dashUnlocked: 0
   healthRegenPerSec: 0
+  killAoE: 0
 --- !u!1 &135000000
 GameObject:
   m_ObjectHideFlags: 0
@@ -2668,10 +2675,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   meleePrefab: {fileID: 3127573181285724724, guid: 2e616943950183845875b29ed980d7f0, type: 3}
   shooterPrefab: {fileID: 3127573181285724724, guid: 0f327788d8afc744b9d6f3d5affeb49f, type: 3}
+  teleporterPrefab: {fileID: 0}
+  advancedPrefab: {fileID: 0}
   bossPrefab: {fileID: 3127573181285724724, guid: 6591ec6c8e9745e4aa49d21c305c8620, type: 3}
   bossSpawnTime: 2
   minBossDistance: 8
   spawnInterval: 5
+  timeWeight: 1
+  killWeight: 0.1
+  damageWeight: 0.05
+  chaseWeight: 0.5
+  accuracyWeight: 1
+  killTimeWeight: 1
 --- !u!4 &1488817118
 Transform:
   m_ObjectHideFlags: 0
@@ -2772,7 +2787,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1591677660}
   - component: {fileID: 1591677659}
-  - component: {fileID: 3333333333333333333}
   m_Layer: 0
   m_Name: MapChunkManager
   m_TagString: Untagged
@@ -2796,21 +2810,6 @@ MonoBehaviour:
   floorPrefab: {fileID: 4633894895710927141, guid: fe62652ea405f794ca08a65e74c12279, type: 3}
   chunkSize: 10
   loadRadius: 2
---- !u!114 &3333333333333333333
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1591677658}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b8360b9b599435e42b3c6672303dcc87, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
-  bakeOnEnable: 1
-  updateMethod: 0
-  updateAsync: 0
 --- !u!4 &1591677660
 Transform:
   m_ObjectHideFlags: 0
