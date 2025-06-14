@@ -28,6 +28,11 @@ public class DifficultyManager : MonoBehaviour
     [Tooltip("Weight for time spent chasing vs. attacking.")]
     public float chaseWeight = 0.5f;
 
+    [Tooltip("Multiplier added based on shot accuracy (0-1).")]
+    public float accuracyWeight = 1f;
+    [Tooltip("Multiplier added per second faster kill time.")]
+    public float killTimeWeight = 1f;
+
     private float nextSpawnTime;
     private bool bossSpawned = false;
     private int enemiesDefeated;
@@ -173,14 +178,19 @@ public class DifficultyManager : MonoBehaviour
 
         float damageFactor = 0f;
         float chaseFactor = 0f;
+        float accuracyFactor = 0f;
+        float killTimeFactor = 0f;
         var m = RunMetrics.Instance;
         if (m != null)
         {
             damageFactor = m.damageTaken * damageWeight;
             float ratio = m.timeInChase / Mathf.Max(1f, m.timeInAttack);
             chaseFactor = ratio * chaseWeight;
+            accuracyFactor = m.Accuracy * accuracyWeight;
+            if (m.AverageKillTime > 0f)
+                killTimeFactor = killTimeWeight / m.AverageKillTime;
         }
 
-        return 1f + timeFactor + killFactor + damageFactor + chaseFactor;
+        return 1f + timeFactor + killFactor + damageFactor + chaseFactor + accuracyFactor + killTimeFactor;
     }
 }

@@ -17,9 +17,12 @@ public class EnemyHealth : MonoBehaviour
     [Header("Feedback")]
     public FloatingDamageText damageTextPrefab;
 
+    private float spawnTime;
+
     void Start()
     {
         currentHealth = maxHealth;
+        spawnTime = Time.time;
     }
 
     public void TakeDamage(int amount)
@@ -39,6 +42,7 @@ public class EnemyHealth : MonoBehaviour
 
     void Die()
     {
+        RunMetrics.Instance?.RegisterKillTime(Time.time - spawnTime);
         // 1) Spawn health or XP
         if (Random.value < healthDropChance && healthPickupPrefab != null)
             Instantiate(healthPickupPrefab, transform.position, Quaternion.identity);

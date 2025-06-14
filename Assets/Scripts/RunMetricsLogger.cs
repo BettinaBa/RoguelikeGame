@@ -19,8 +19,8 @@ public class RunMetricsLogger : MonoBehaviour
         if (m == null)
             return;
 
-        string header = "Kills,DamageTaken,TimeInChase,TimeInAttack,PUPEarned";
-        string line = $"{m.kills},{m.damageTaken},{m.timeInChase:F2},{m.timeInAttack:F2},{pupEarned}";
+        string header = "Kills,DamageTaken,TimeInChase,TimeInAttack,ShotsFired,ShotsHit,AvgKillTime,PUPEarned";
+        string line = $"{m.kills},{m.damageTaken},{m.timeInChase:F2},{m.timeInAttack:F2},{m.shotsFired},{m.shotsHit},{m.AverageKillTime:F2},{pupEarned}";
 
         bool exists = File.Exists(CsvPath);
         using (var writer = new StreamWriter(CsvPath, append: true))
