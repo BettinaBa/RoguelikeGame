@@ -2772,6 +2772,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1591677660}
   - component: {fileID: 1591677659}
+  - component: {fileID: 3333333333333333333}
   m_Layer: 0
   m_Name: MapChunkManager
   m_TagString: Untagged
@@ -2795,6 +2796,21 @@ MonoBehaviour:
   floorPrefab: {fileID: 4633894895710927141, guid: fe62652ea405f794ca08a65e74c12279, type: 3}
   chunkSize: 10
   loadRadius: 2
+--- !u!114 &3333333333333333333
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1591677658}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b8360b9b599435e42b3c6672303dcc87, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  bakeOnEnable: 1
+  updateMethod: 0
+  updateAsync: 0
 --- !u!4 &1591677660
 Transform:
   m_ObjectHideFlags: 0

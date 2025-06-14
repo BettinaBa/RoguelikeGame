@@ -13,6 +13,13 @@ public class PlayerMovement : MonoBehaviour
     [Tooltip("Seconds between dashes.")]
     public float dashCooldown = 1f;
 
+    [Header("Sprint Settings")]
+    public float sprintMultiplier = 1.5f;
+    public float sprintCooldown = 0.5f;
+
+    private bool isSprinting;
+    private float lastSprintTime = -Mathf.Infinity;
+
     private Rigidbody2D rb;
     private Vector2 moveInput;
     private float lastDashTime = -Mathf.Infinity;
@@ -25,6 +32,21 @@ public class PlayerMovement : MonoBehaviour
         // Apply permanent speed multiplier from Meta_SpeedMult
         float metaMult = PlayerPrefs.GetFloat("Meta_SpeedMult", 1f);
         moveSpeed *= metaMult;
+    }
+
+    public void OnSprint(InputValue value)
+    {
+        if (value.isPressed)
+        {
+            if (Time.time >= lastSprintTime + sprintCooldown)
+                isSprinting = true;
+        }
+        else
+        {
+            if (isSprinting)
+                lastSprintTime = Time.time;
+            isSprinting = false;
+        }
     }
 
     void Update()
@@ -63,6 +85,7 @@ public class PlayerMovement : MonoBehaviour
         if (GameOverManager.Instance != null && GameOverManager.Instance.IsGameOver)
             return;
 
-        rb.MovePosition(rb.position + moveInput * moveSpeed * Time.fixedDeltaTime);
+        float speed = moveSpeed * (isSprinting ? sprintMultiplier : 1f);
+        rb.MovePosition(rb.position + moveInput * speed * Time.fixedDeltaTime);
     }
 }
