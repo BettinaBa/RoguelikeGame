@@ -69,6 +69,7 @@ public class PlayerShoot : MonoBehaviour
                 pb.critChance = stats.critChance;
                 pb.critMultiplier = stats.critMultiplier;
                 pb.lifeStealFrac = stats.lifeStealFraction;
+                pb.stunChance = stats.stunChance;
                 pb.piercing = stats.piercingBullets;
                 pb.shieldHits = stats.shieldHits;
             }
