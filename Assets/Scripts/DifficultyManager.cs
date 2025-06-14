@@ -7,6 +7,7 @@ public class DifficultyManager : MonoBehaviour
     [Header("Spawn Settings")]
     public GameObject meleePrefab;
     public GameObject shooterPrefab;
+    public GameObject teleporterPrefab;
     [Tooltip("Prefab for the mini-boss.")]
     public GameObject bossPrefab;
     [Tooltip("Seconds until boss appears.")]
@@ -68,7 +69,14 @@ public class DifficultyManager : MonoBehaviour
 
     private void SpawnEnemy()
     {
-        GameObject prefab = (Random.value < 0.5f) ? meleePrefab : shooterPrefab;
+        GameObject prefab;
+        float roll = Random.value;
+        if (roll < 0.33f)
+            prefab = meleePrefab;
+        else if (roll < 0.66f)
+            prefab = shooterPrefab;
+        else
+            prefab = teleporterPrefab;
         if (prefab == null) return;
 
         Vector3 pos = GetEdgeSpawnPosition();
