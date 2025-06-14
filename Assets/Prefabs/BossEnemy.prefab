@@ -194,7 +194,7 @@ MonoBehaviour:
   healthPickupPrefab: {fileID: 8365154387049940543, guid: 9ca8565c5e857f74d920b1cd31d620c3, type: 3}
   healthDropChance: 0
   damageTextPrefab: {fileID: 0}
---- !u!114 &-7827119864390000583
+--- !u!114 &-2437136510676715986
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -203,14 +203,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 3127573181285724724}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e74b5e6ecae44530aa30b03928efb4d5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  chaseRange: 200
-  moveSpeed: 1.58
-  patrolChangeInterval: 2
-  attackCooldown: 1
-  damage: 1
-  playerLayer:
-    serializedVersion: 2
-    m_Bits: 64
+  m_Script: {fileID: 11500000, guid: c6bdb587dd99462f9aa1550cdfe84be4, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  minionPrefab: {fileID: 3127573181285724724, guid: 2e616943950183845875b29ed980d7f0, type: 3}
+  areaAttackPrefab: {fileID: 100000, guid: be708c5be9f54f55bd1d889fb78e0c27, type: 3}
+  summonCooldown: 5
+  areaCooldown: 8
+  enragedThreshold: 0.5
+  enragedRate: 0.5
