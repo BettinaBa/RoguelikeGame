@@ -1,5 +1,5 @@
 using UnityEngine;
-using UnityEngine.AI;
+
 
 [RequireComponent(typeof(Rigidbody2D), typeof(Collider2D))]
 [RequireComponent(typeof(BehaviorTreeRunner))]
@@ -18,7 +18,6 @@ public class BehaviorEnemyAI : MonoBehaviour
     public LayerMask playerLayer;
 
     Rigidbody2D rb;
-    NavMeshAgent agent;
     Transform player;
     Vector2 patrolDir;
     float nextPatrolChange;
@@ -28,14 +27,6 @@ public class BehaviorEnemyAI : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
-        agent = GetComponent<NavMeshAgent>();
-        if (agent != null)
-        {
-            agent.updateRotation = false;
-            agent.updateUpAxis = false;
-            agent.speed = moveSpeed;
-            agent.isStopped = true;
-        }
         player = GameObject.FindGameObjectWithTag("Player")?.transform;
         ChooseNewPatrolDirection();
 
@@ -63,8 +54,6 @@ public class BehaviorEnemyAI : MonoBehaviour
         if (Time.time >= nextPatrolChange)
             ChooseNewPatrolDirection();
 
-        if (agent != null)
-            agent.isStopped = true;
         rb.MovePosition(rb.position + patrolDir * moveSpeed * Time.deltaTime);
         return BTNode.State.Running;
     }
@@ -78,16 +67,8 @@ public class BehaviorEnemyAI : MonoBehaviour
         if (dist <= attackRange)
             return BTNode.State.Success;
 
-        if (agent != null)
-        {
-            agent.isStopped = false;
-            agent.SetDestination(player.position);
-        }
-        else
-        {
-            Vector2 dir = ((Vector2)player.position - rb.position).normalized;
-            rb.MovePosition(rb.position + dir * moveSpeed * Time.deltaTime);
-        }
+        Vector2 dir = ((Vector2)player.position - rb.position).normalized;
+        rb.MovePosition(rb.position + dir * moveSpeed * Time.deltaTime);
         return BTNode.State.Running;
     }
 
@@ -111,8 +92,6 @@ public class BehaviorEnemyAI : MonoBehaviour
         if (player == null) return BTNode.State.Failure;
         if (Time.time >= retreatEnd)
             return BTNode.State.Success;
-        if (agent != null)
-            agent.isStopped = true;
         Vector2 dir = ((Vector2)transform.position - (Vector2)player.position).normalized;
         rb.MovePosition(rb.position + dir * moveSpeed * Time.deltaTime);
         return BTNode.State.Running;
