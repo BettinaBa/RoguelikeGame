@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.AI;
 
 [RequireComponent(typeof(EnemyHealth))]
 public class BossAI : MonoBehaviour
@@ -61,7 +62,10 @@ public class BossAI : MonoBehaviour
         for (int i = 0; i < count; i++)
         {
             Vector2 offset = Random.insideUnitCircle * 1.5f;
-            Instantiate(minionPrefab, (Vector2)transform.position + offset, Quaternion.identity);
+            Vector3 target = transform.position + (Vector3)offset;
+            if (NavMesh.SamplePosition(target, out var hit, 1f, NavMesh.AllAreas))
+                target = hit.position;
+            Instantiate(minionPrefab, target, Quaternion.identity);
         }
     }
 
