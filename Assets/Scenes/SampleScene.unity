@@ -180,6 +180,7 @@ GameObject:
   m_Component:
   - component: {fileID: 84016986}
   - component: {fileID: 84016987}
+  - component: {fileID: 84016988}
   m_Layer: 0
   m_Name: RoomGenerator
   m_TagString: Untagged
@@ -214,9 +215,42 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 09b78e8a52a4eaa43964c496e33ead80, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  floorPrefab: {fileID: 4633894895710927141, guid: fe62652ea405f794ca08a65e74c12279, type: 3}
+  floorPrefab: {fileID: 4633894895710927141, guid: fe62652ea405f794ca08a65e74c12279,
+    type: 3}
   width: 10
   height: 10
+--- !u!114 &84016988
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 84016983}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7a5ac11cc976e418e8d13136b07e1f52, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_SerializedVersion: 0
+  m_AgentTypeID: 0
+  m_CollectObjects: 0
+  m_Size: {x: 10, y: 10, z: 10}
+  m_Center: {x: 0, y: 2, z: 0}
+  m_LayerMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_UseGeometry: 0
+  m_DefaultArea: 0
+  m_GenerateLinks: 0
+  m_IgnoreNavMeshAgent: 1
+  m_IgnoreNavMeshObstacle: 1
+  m_OverrideTileSize: 0
+  m_TileSize: 256
+  m_OverrideVoxelSize: 0
+  m_VoxelSize: 0.16666667
+  m_MinRegionArea: 2
+  m_NavMeshData: {fileID: 23800000, guid: 410baf6aab1fcf747b9f2efb80dc4776, type: 2}
+  m_BuildHeightMesh: 0
 --- !u!1 &111528421
 GameObject:
   m_ObjectHideFlags: 0
@@ -458,7 +492,8 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: -2413806693520163455, guid: a86470a33a6bf42c4b3595704624658b, type: 3}
+  m_Sprite: {fileID: -2413806693520163455, guid: a86470a33a6bf42c4b3595704624658b,
+    type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -566,7 +601,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 62899f850307741f2a39c98a8b639597, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
+  m_Actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100,
+    type: 3}
   m_NotificationBehavior: 0
   m_UIInputModule: {fileID: 0}
   m_DeviceLostEvent:
@@ -696,7 +732,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c217735c538291344aaf1172183a2950, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bulletPrefab: {fileID: 2559579291929284584, guid: a0f0695e7a6aa5f48bd938c3c32d6438, type: 3}
+  bulletPrefab: {fileID: 2559579291929284584, guid: a0f0695e7a6aa5f48bd938c3c32d6438,
+    type: 3}
   baseFireRate: 3
   bulletSpeed: 15
   spawnOffset: 0.6
@@ -771,7 +808,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   levelUpPanel: {fileID: 1033313535}
   buttonContainer: {fileID: 1118645719}
-  optionButtonPrefab: {fileID: 5068783370750895070, guid: c6f658b3d52a31d4193e9eeb0d8d20c0, type: 3}
+  optionButtonPrefab: {fileID: 5068783370750895070, guid: c6f658b3d52a31d4193e9eeb0d8d20c0,
+    type: 3}
 --- !u!1 &144253932
 GameObject:
   m_ObjectHideFlags: 0
@@ -801,8 +839,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e851b76aa4a57c64b8891145f9842682, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  floorPrefab: {fileID: 4633894895710927141, guid: fe62652ea405f794ca08a65e74c12279, type: 3}
-  wallPrefab: {fileID: 8779090632006588196, guid: 850b934d2e056b24693ec2f73a04e38b, type: 3}
+  floorPrefab: {fileID: 4633894895710927141, guid: fe62652ea405f794ca08a65e74c12279,
+    type: 3}
+  wallPrefab: {fileID: 8779090632006588196, guid: 850b934d2e056b24693ec2f73a04e38b,
+    type: 3}
   width: 50
   height: 50
   minRoomSize: 6
@@ -859,17 +899,28 @@ MonoBehaviour:
   m_MoveRepeatDelay: 0.5
   m_MoveRepeatRate: 0.1
   m_XRTrackingOrigin: {fileID: 0}
-  m_ActionsAsset: {fileID: -944628639613478452, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
-  m_PointAction: {fileID: -1654692200621890270, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
-  m_MoveAction: {fileID: -8784545083839296357, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
-  m_SubmitAction: {fileID: 392368643174621059, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
-  m_CancelAction: {fileID: 7727032971491509709, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
-  m_LeftClickAction: {fileID: 3001919216989983466, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
-  m_MiddleClickAction: {fileID: -2185481485913320682, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
-  m_RightClickAction: {fileID: -4090225696740746782, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
-  m_ScrollWheelAction: {fileID: 6240969308177333660, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
-  m_TrackedDevicePositionAction: {fileID: 6564999863303420839, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
-  m_TrackedDeviceOrientationAction: {fileID: 7970375526676320489, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
+  m_ActionsAsset: {fileID: -944628639613478452, guid: ca9f5fa95ffab41fb9a615ab714db018,
+    type: 3}
+  m_PointAction: {fileID: -1654692200621890270, guid: ca9f5fa95ffab41fb9a615ab714db018,
+    type: 3}
+  m_MoveAction: {fileID: -8784545083839296357, guid: ca9f5fa95ffab41fb9a615ab714db018,
+    type: 3}
+  m_SubmitAction: {fileID: 392368643174621059, guid: ca9f5fa95ffab41fb9a615ab714db018,
+    type: 3}
+  m_CancelAction: {fileID: 7727032971491509709, guid: ca9f5fa95ffab41fb9a615ab714db018,
+    type: 3}
+  m_LeftClickAction: {fileID: 3001919216989983466, guid: ca9f5fa95ffab41fb9a615ab714db018,
+    type: 3}
+  m_MiddleClickAction: {fileID: -2185481485913320682, guid: ca9f5fa95ffab41fb9a615ab714db018,
+    type: 3}
+  m_RightClickAction: {fileID: -4090225696740746782, guid: ca9f5fa95ffab41fb9a615ab714db018,
+    type: 3}
+  m_ScrollWheelAction: {fileID: 6240969308177333660, guid: ca9f5fa95ffab41fb9a615ab714db018,
+    type: 3}
+  m_TrackedDevicePositionAction: {fileID: 6564999863303420839, guid: ca9f5fa95ffab41fb9a615ab714db018,
+    type: 3}
+  m_TrackedDeviceOrientationAction: {fileID: 7970375526676320489, guid: ca9f5fa95ffab41fb9a615ab714db018,
+    type: 3}
   m_DeselectOnBackgroundClick: 1
   m_PointerBehavior: 0
   m_CursorLockBehavior: 0
@@ -2862,11 +2913,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 43d07cb783a248e0921b22009cdf6e30, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  meleePrefab: {fileID: 3127573181285724724, guid: 2e616943950183845875b29ed980d7f0, type: 3}
-  shooterPrefab: {fileID: 3127573181285724724, guid: 0f327788d8afc744b9d6f3d5affeb49f, type: 3}
-  teleporterPrefab: {fileID: 3127573181285724724, guid: 99c0d99ed92e43f4bbd81f61cbc214ac, type: 3}
-  advancedPrefab: {fileID: 3127573181285724724, guid: 203dd76e24df4da8afb95121f54a8918, type: 3}
-  bossPrefab: {fileID: 3127573181285724724, guid: 6591ec6c8e9745e4aa49d21c305c8620, type: 3}
+  meleePrefab: {fileID: 3127573181285724724, guid: 2e616943950183845875b29ed980d7f0,
+    type: 3}
+  shooterPrefab: {fileID: 3127573181285724724, guid: 0f327788d8afc744b9d6f3d5affeb49f,
+    type: 3}
+  teleporterPrefab: {fileID: 3127573181285724724, guid: 99c0d99ed92e43f4bbd81f61cbc214ac,
+    type: 3}
+  advancedPrefab: {fileID: 3127573181285724724, guid: 203dd76e24df4da8afb95121f54a8918,
+    type: 3}
+  behaviorPrefab: {fileID: 0}
+  bossPrefab: {fileID: 3127573181285724724, guid: 6591ec6c8e9745e4aa49d21c305c8620,
+    type: 3}
   bossSpawnTime: 2
   minBossDistance: 8
   spawnInterval: 5
@@ -3043,7 +3100,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   player: {fileID: 126443107}
-  floorPrefab: {fileID: 4633894895710927141, guid: fe62652ea405f794ca08a65e74c12279, type: 3}
+  floorPrefab: {fileID: 4633894895710927141, guid: fe62652ea405f794ca08a65e74c12279,
+    type: 3}
   chunkSize: 10
   loadRadius: 2
 --- !u!4 &1591677660
@@ -3091,7 +3149,7 @@ MonoBehaviour:
   m_OverrideVoxelSize: 0
   m_VoxelSize: 0.16666667
   m_MinRegionArea: 2
-  m_NavMeshData: {fileID: 0}
+  m_NavMeshData: {fileID: 23800000, guid: 401852ac5dbe92645ad803dc5b08f09d, type: 2}
   m_BuildHeightMesh: 0
 --- !u!1 &1595051173
 GameObject:
