@@ -16,7 +16,6 @@ public class EnemyAI : MonoBehaviour
     public LayerMask playerLayer;  // set this to only include your Player layer
 
     Rigidbody2D rb;
-    UnityEngine.AI.NavMeshAgent agent;
     Transform player;
     Vector2 patrolDir;
     float nextPatrolChange;
@@ -29,13 +28,6 @@ public class EnemyAI : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
-        agent = GetComponent<UnityEngine.AI.NavMeshAgent>();
-        if (agent != null)
-        {
-            agent.updateRotation = false;
-            agent.updateUpAxis = false;
-            agent.speed = moveSpeed;
-        }
         player = GameObject.FindGameObjectWithTag("Player")?.transform;
         ChooseNewPatrolDirection();
     }
@@ -48,8 +40,6 @@ public class EnemyAI : MonoBehaviour
         if (stunTimer > 0f)
         {
             stunTimer -= Time.deltaTime;
-            if (agent != null)
-                agent.isStopped = true;
             return;
         }
 
@@ -61,15 +51,11 @@ public class EnemyAI : MonoBehaviour
         else if (currentState == State.Chase && dist > chaseRange)
             currentState = State.Patrol;
 
-        if (agent != null)
-            agent.isStopped = currentState != State.Chase;
 
         // record chase time
         if (currentState == State.Chase)
         {
             RunMetrics.Instance?.RecordChase(Time.deltaTime);
-            if (agent != null)
-                agent.SetDestination(player.position);
         }
 
         // change patrol direction occasionally
@@ -87,22 +73,12 @@ public class EnemyAI : MonoBehaviour
 
         if (currentState == State.Patrol)
         {
-            if (agent != null)
-                agent.isStopped = true;
             rb.MovePosition(rb.position + patrolDir * moveSpeed * Time.fixedDeltaTime);
         }
         else // Chase
         {
-            if (agent != null)
-            {
-                agent.isStopped = false;
-                agent.SetDestination(player.position);
-            }
-            else
-            {
-                Vector2 dir = ((Vector2)player.position - rb.position).normalized;
-                rb.MovePosition(rb.position + dir * moveSpeed * Time.fixedDeltaTime);
-            }
+            Vector2 dir = ((Vector2)player.position - rb.position).normalized;
+            rb.MovePosition(rb.position + dir * moveSpeed * Time.fixedDeltaTime);
         }
     }
 
