@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.AI;
 
 public class DifficultyManager : MonoBehaviour
 {
@@ -130,21 +131,27 @@ public class DifficultyManager : MonoBehaviour
             return;
         }
 
-        // pick random point in view until it's far enough from player
+        // pick random point in view until it's far enough from player and on the NavMesh
         Bounds area = GetCameraBounds();
-        Vector3 spawn;
+        Vector3 spawn = player.transform.position + Vector3.right * minBossDistance;
         int tries = 0;
-        do
+        NavMeshHit hit;
+        while (tries < 20)
         {
-            spawn = new Vector3(
+            Vector3 candidate = new Vector3(
                 Random.Range(area.min.x, area.max.x),
                 Random.Range(area.min.y, area.max.y),
                 0f
             );
             tries++;
+            if (Vector2.Distance(candidate, player.transform.position) < minBossDistance)
+                continue;
+            if (NavMesh.SamplePosition(candidate, out hit, 2f, NavMesh.AllAreas))
+            {
+                spawn = hit.position;
+                break;
+            }
         }
-        while (Vector2.Distance(spawn, player.transform.position) < minBossDistance
-               && tries < 20);
 
         Instantiate(bossPrefab, spawn, Quaternion.identity);
         Debug.Log("Mini-boss spawned at " + spawn);

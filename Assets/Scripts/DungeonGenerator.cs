@@ -58,6 +58,8 @@ public class DungeonGenerator : MonoBehaviour
 
         foreach (var pos in data.walls)
             Instantiate(wallPrefab, new Vector3(pos.x, pos.y, 1f), Quaternion.identity, transform);
+
+        GetComponent<NavMeshBaker>()?.Bake();
     }
 
     void ClearChildren()
