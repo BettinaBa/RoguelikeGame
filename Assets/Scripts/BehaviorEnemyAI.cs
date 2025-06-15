@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.AI;
 
-[RequireComponent(typeof(Rigidbody2D), typeof(Collider2D), typeof(NavMeshAgent))]
+[RequireComponent(typeof(Rigidbody2D), typeof(Collider2D))]
 [RequireComponent(typeof(BehaviorTreeRunner))]
 public class BehaviorEnemyAI : MonoBehaviour
 {

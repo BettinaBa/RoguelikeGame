@@ -8,7 +8,7 @@ public abstract class UtilityAction
     public abstract void Act();
 }
 
-[RequireComponent(typeof(Rigidbody2D), typeof(Collider2D), typeof(NavMeshAgent))]
+[RequireComponent(typeof(Rigidbody2D), typeof(Collider2D))]
 public class UtilityEnemyAI : MonoBehaviour
 {
     [Header("Movement & Detection")]

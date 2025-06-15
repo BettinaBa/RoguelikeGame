@@ -63,8 +63,6 @@ public class BSPDungeonGenerator : MonoBehaviour
 
         foreach (var pos in data.walls)
             Instantiate(wallPrefab, new Vector3(pos.x, pos.y, 1f), Quaternion.identity, transform);
-
-        GetComponent<NavMeshBaker>()?.Bake();
     }
 
     static IEnumerable<Vector2Int> Directions()
