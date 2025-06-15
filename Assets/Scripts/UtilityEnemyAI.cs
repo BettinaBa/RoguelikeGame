@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.AI;
 using System.Collections.Generic;
 
 public abstract class UtilityAction
@@ -22,7 +21,6 @@ public class UtilityEnemyAI : MonoBehaviour
     public LayerMask playerLayer;
 
     Rigidbody2D rb;
-    NavMeshAgent agent;
     Transform player;
     List<UtilityAction> actions;
     float lastAttackTime;
@@ -30,14 +28,6 @@ public class UtilityEnemyAI : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
-        agent = GetComponent<NavMeshAgent>();
-        if (agent != null)
-        {
-            agent.updateRotation = false;
-            agent.updateUpAxis = false;
-            agent.speed = moveSpeed;
-            agent.isStopped = true;
-        }
         player = GameObject.FindGameObjectWithTag("Player")?.transform;
 
         actions = new List<UtilityAction>
@@ -101,8 +91,6 @@ public class UtilityEnemyAI : MonoBehaviour
         {
             if (Time.time >= nextChange)
                 ChooseNewDir();
-            if (ai.agent != null)
-                ai.agent.isStopped = true;
             ai.rb.MovePosition(ai.rb.position + roamDir * ai.moveSpeed * Time.deltaTime);
         }
     }
@@ -120,16 +108,8 @@ public class UtilityEnemyAI : MonoBehaviour
 
         public override void Act()
         {
-            if (ai.agent != null)
-            {
-                ai.agent.isStopped = false;
-                ai.agent.SetDestination(ai.player.position);
-            }
-            else
-            {
-                Vector2 dir = ((Vector2)ai.player.position - ai.rb.position).normalized;
-                ai.rb.MovePosition(ai.rb.position + dir * ai.moveSpeed * Time.deltaTime);
-            }
+            Vector2 dir = ((Vector2)ai.player.position - ai.rb.position).normalized;
+            ai.rb.MovePosition(ai.rb.position + dir * ai.moveSpeed * Time.deltaTime);
         }
     }
 
@@ -173,8 +153,6 @@ public class UtilityEnemyAI : MonoBehaviour
         {
             if (Time.time >= retreatEnd)
                 retreatEnd = Time.time + duration;
-            if (ai.agent != null)
-                ai.agent.isStopped = true;
             Vector2 dir = ((Vector2)ai.transform.position - (Vector2)ai.player.position).normalized;
             ai.rb.MovePosition(ai.rb.position + dir * ai.moveSpeed * Time.deltaTime);
         }

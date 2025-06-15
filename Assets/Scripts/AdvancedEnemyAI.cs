@@ -18,7 +18,7 @@ public class AdvancedEnemyAI : MonoBehaviour
     public LayerMask playerLayer;
 
     Rigidbody2D rb;
-    UnityEngine.AI.NavMeshAgent agent;
+
     Transform player;
     Vector2 patrolDir;
     float lastAttackTime;
@@ -30,14 +30,6 @@ public class AdvancedEnemyAI : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
-        agent = GetComponent<UnityEngine.AI.NavMeshAgent>();
-        if (agent != null)
-        {
-            agent.updateRotation = false;
-            agent.updateUpAxis = false;
-            agent.speed = moveSpeed;
-            agent.isStopped = true;
-        }
         player = GameObject.FindGameObjectWithTag("Player")?.transform;
         stateEndTime = Time.time + idleDuration;
     }
@@ -70,8 +62,11 @@ public class AdvancedEnemyAI : MonoBehaviour
                     EnterState(State.Attack);
                 else if (dist > chaseRange)
                     EnterState(State.Patrol);
-                else if (agent != null)
-                    agent.SetDestination(player.position);
+                else
+                {
+                    Vector2 dir = ((Vector2)player.position - rb.position).normalized;
+                    rb.MovePosition(rb.position + dir * moveSpeed * Time.deltaTime);
+                }
                 break;
 
             case State.Attack:
@@ -111,25 +106,16 @@ public class AdvancedEnemyAI : MonoBehaviour
         {
             case State.Idle:
                 stateEndTime = Time.time + idleDuration;
-                if (agent != null) agent.isStopped = true;
                 break;
             case State.Patrol:
                 stateEndTime = Time.time + patrolChangeInterval;
-                if (agent != null) agent.isStopped = true;
                 ChooseNewPatrolDirection();
                 break;
             case State.Chase:
-                if (agent != null)
-                {
-                    agent.isStopped = false;
-                    agent.SetDestination(player.position);
-                }
                 break;
             case State.Attack:
-                if (agent != null) agent.isStopped = true;
                 break;
             case State.Retreat:
-                if (agent != null) agent.isStopped = true;
                 stateEndTime = Time.time + retreatDuration;
                 break;
         }
