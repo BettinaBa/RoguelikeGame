@@ -1,6 +1,6 @@
 using UnityEngine;
 
-[RequireComponent(typeof(Rigidbody2D), typeof(Collider2D), typeof(UnityEngine.AI.NavMeshAgent))]
+[RequireComponent(typeof(Rigidbody2D), typeof(Collider2D))]
 public class AdvancedEnemyAI : MonoBehaviour
 {
     [Header("Movement & Detection")]

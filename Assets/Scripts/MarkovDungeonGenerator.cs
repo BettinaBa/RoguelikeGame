@@ -34,7 +34,6 @@ public class MarkovDungeonGenerator : MonoBehaviour
         ClearChildren();
         GenerateGrid();
         InstantiateTiles();
-        GetComponent<NavMeshBaker>()?.Bake();
     }
 
     void GenerateGrid()
@@ -78,8 +77,6 @@ public class MarkovDungeonGenerator : MonoBehaviour
                     Instantiate(prefab, new Vector3(x, y, 1f), Quaternion.identity, transform);
         }
         }
-
-        GetComponent<NavMeshBaker>()?.Bake();
     }
 
     void ClearChildren()

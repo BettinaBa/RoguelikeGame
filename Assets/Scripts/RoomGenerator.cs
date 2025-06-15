@@ -16,7 +16,6 @@ public class RoomGenerator : MonoBehaviour
     {
         ClearChildren();
         GenerateRoom();
-        GetComponent<NavMeshBaker>()?.Bake();
     }
 
     void GenerateRoom()
@@ -31,7 +30,6 @@ public class RoomGenerator : MonoBehaviour
                 transform
             );
         }
-        GetComponent<NavMeshBaker>()?.Bake();
     }
 
     public static HashSet<Vector2Int> GenerateRoomData(int width, int height)
